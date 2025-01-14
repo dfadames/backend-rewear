@@ -1,5 +1,5 @@
 //importamos la libreria de mysql
-const mysql = require("mysql");
+const mysql = require("mysql2");
 
 // informacion de conexion de la base de datos
 const dbConfig = {
