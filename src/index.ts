@@ -18,6 +18,15 @@ app.use(bodyParser.json());
 //uso de ficheros
 app.use(express.json());
 
+//config de cors para permitir peticiones
+const corsOptions = {
+  origin: ['http://localhost:3000', 'https://frontend-re-wear.vercel.app/'], 
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos permitidos
+  allowedHeaders: ['Content-Type', 'Authorization'], // Cabeceras permitidas
+};
+
+// Middleware de CORS
+app.use(cors(corsOptions));
 //puerto
 const PORT = process.env.PORT;
 
