@@ -51,13 +51,13 @@ export const login = (req: Request, res: Response) => {
 
 //se realiza una peticion para insertar datos en la base de datos
 export const register = async (req: Request, res: Response) => {
-  const {first_name,last_name,phone,registration_date,email, password, role } = req.body;
+  const {first_name,last_name,phone,email, password, role } = req.body;
 
   try {
     // Genera una sal y hashea la contraseña
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
-
+    const registration_date = new Date();
     const query =
       "INSERT INTO USER (first_name,last_name,phone,registration_date,email, password ) VALUES (?, ?, ?,?,?,?)";
 
