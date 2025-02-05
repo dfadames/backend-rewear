@@ -73,3 +73,30 @@ export const updateProduct = (req, res) => {
   });
 };
 
+// Delete producto
+
+export const deleteProduct = (req, res) => {
+  // Extraemos el ID del producto desde los parámetros de la URL
+  const productId = req.params.id;
+  
+  // Obtenemos el username del usuario autenticado
+  const username = req.user.username;
+
+  // Preparamos la consulta SQL para eliminar el producto, comprobando que pertenezca al usuario
+  const query = "DELETE FROM productos WHERE id = ? AND username = ?";
+
+  //Ejecutamos la consulta pasando el ID y el username
+  executeQuery(query, [productId, username], (err, results) => {
+    if (err) {
+      console.error("Error al eliminar el producto:", err);
+      return res.status(500).json({ error: "Error interno del servidor" });
+    }
+
+    // Verificamos si se afectó alguna fila (si no, el producto no existe o no pertenece al usuario)
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ error: "Producto no encontrado o no pertenece al usuario" });
+    }
+
+    res.status(200).json({ message: "Producto eliminado exitosamente" });
+  });
+};
