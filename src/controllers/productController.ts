@@ -35,3 +35,41 @@ export const createProduct = (req, res) => {
   });
 };
 
+
+
+// Update producto
+
+export const updateProduct = (req, res) => {
+  // Extraemos el ID del producto desde los parámetros de la URL
+  const productId = req.params.id;
+  
+  // Obtenemos el username del usuario autenticado
+  const username = req.user.username;
+  
+  // Extraemos los datos actualizados del cuerpo de la petición
+  const { nombre, precio, categoria, descripcion } = req.body;
+
+  // Validamos que todos los campos requeridos estén presentes
+  if (!nombre || !precio || !categoria || !descripcion) {
+    return res.status(400).json({ error: "Todos los campos son obligatorios: nombre, precio, categoria y descripcion" });
+  }
+
+  // Preparamos la consulta SQL para actualizar el producto, asegurándonos que el producto pertenezca al usuario
+  const query = "UPDATE productos SET nombre = ?, precio = ?, categoria = ?, descripcion = ? WHERE id = ? AND username = ?";
+
+  // Ejecutamos la consulta con los parámetros, incluido el username
+  executeQuery(query, [nombre, precio, categoria, descripcion, productId, username], (err, results) => {
+    if (err) {
+      console.error("Error al actualizar el producto:", err);
+      return res.status(500).json({ error: "Error interno del servidor" });
+    }
+
+    // Verificamos si se afectó alguna fila (si no, el producto no existe o no pertenece al usuario)
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ error: "Producto no encontrado o no pertenece al usuario" });
+    }
+
+    res.status(200).json({ message: "Producto actualizado exitosamente" });
+  });
+};
+
