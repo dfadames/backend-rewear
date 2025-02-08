@@ -34,6 +34,9 @@ const PORT = process.env.PORT;
 import { login, register } from "./controllers/authController";
 import { ping, getUsuarios } from "./controllers/othersController";
 import { authenticateToken } from "./token/authtoken";
+import { getProfileInfo } from "./controllers/profileController";
+// con base al token obtenemos la info necesaria
+const getProfileData = [authenticateToken, getProfileInfo];
 //configuramos las rutas con su debida funcion y metodo
 //rutas de autenticacion de credenciales
 app.post("/login", login);
@@ -44,7 +47,10 @@ app.get("/ping", ping);
 app.get("/usuarios", getUsuarios);
 
 
-
+//rutas para el acceso de informacion del perfil
+app.get("/perfil", getProfileData, (req: any, res: any) => {
+  res.json(req.body.profileInfo[0]);
+});
 
 //saca la base de datos
 app.listen(PORT, () => {
