@@ -1,8 +1,41 @@
 // Importamos la función para ejecutar consultas en la base de datos
 import { executeQuery } from "../db/models/queryModel";
 
+
+export const getProductInfo = (req: any, res: any) => {
+  // Obtenemos el ID del usuario autenticado
+  const seller_id = req.user.id;
+
+  // Obtenemos el ID del producto desde los parámetros de la consulta
+  const { product_id } = req.params;
+
+  // Validamos que el ID del producto haya sido proporcionado
+  if (!product_id) {
+    return res.status(400).json({ error: "El ID del producto es obligatorio" });
+  }
+
+  // Consulta SQL para obtener la información del producto que pertenece al usuario autenticado
+  const query = "SELECT * FROM product WHERE id = ? AND seller_id = ?";
+
+  executeQuery(query, [product_id, seller_id], (err: any, results: any) => {
+    if (err) {
+      console.error("Error al obtener la información del producto:", err);
+      return res.status(500).json({ error: "Error interno del servidor" });
+    }
+
+    // Verificamos si el producto existe y pertenece al usuario
+    if (results.length === 0) {
+      return res.status(404).json({ error: "Producto no encontrado o no pertenece al usuario" });
+    }
+
+    // Devolvemos la información del producto
+    res.json(results[0]);
+  });
+};
+
 // crear producto
 export const createProduct = (req: any, res: any) => {
+
   // Extraemos los datos del cuerpo de la petición
   const { name_product, category, price, description, status, publication_status } = req.body;
   // Obtenemos el ID del vendedor desde el usuario autenticado

@@ -39,6 +39,7 @@ import { getProfileInfo } from "./controllers/profileController";
 import { createProduct,updateProduct,deleteProduct,getAllProducts } from "./controllers/productController";
 // con base al token obtenemos la info necesaria
 const getProfileData = [authenticateToken, getProfileInfo];
+const createProductData = [authenticateToken, createProduct];
 //configuramos las rutas con su debida funcion y metodo
 //rutas de autenticacion de credenciales
 app.post("/login", login);
@@ -49,7 +50,7 @@ app.get("/ping", ping);
 app.get("/usuarios", getUsuarios);
 
 // rutas de productos
-app.post("/createProduct", createProduct);
+app.post("/createProduct", createProductData);
 app.post("/updateProduct", updateProduct);
 app.delete("/deleteProduct", deleteProduct);
 
