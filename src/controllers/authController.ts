@@ -10,6 +10,8 @@ import db from "../db/dbConfig";
 import { secretKey } from "../token/authtoken";
 import { executeQuery } from "../db/models/queryModel";
 
+
+//LOGIN
 //se realiza una peticion post que recibe contraseña y usuario y devuelve un token de sesion
 export const login = (req: Request, res: Response) => {
   const { username, password } = req.body;
@@ -50,9 +52,11 @@ export const login = (req: Request, res: Response) => {
   });
 };
 
+
+//REGISTER
 //se realiza una peticion para insertar datos en la base de datos
 export const register = async (req: Request, res: Response) => {
-  const {email,username,password} = req.body;
+  const {first_name, last_names, phone, username,email,password} = req.body;
 
   try {
     // Genera una sal y hashea la contraseña
@@ -60,7 +64,7 @@ export const register = async (req: Request, res: Response) => {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     const registration_date = new Date();
     const query =
-      "INSERT INTO user (email,username,password) VALUES (?, ?, ?)";
+      "INSERT INTO user (first_name, last_names, phone, username, emaixl, password, registration_date) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
     executeQuery(query, [registration_date,email, hashedPassword], (err: Error) => {
       if (err) {
