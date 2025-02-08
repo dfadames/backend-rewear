@@ -22,8 +22,7 @@ export function authenticateToken(req: any, res: any, next: any) {
 
     // Realiza una consulta SQL para obtener la id del usuario con el usuario obtenido del token
     const username = user.username;
-    const getUserIdSql =
-      "SELECT id FROM user WHERE username = ?";
+    const getUserIdSql = "SELECT id FROM user WHERE username = ?";
 
     db.query(getUserIdSql, [username], (err: any, results: any) => {
       if (err) {
