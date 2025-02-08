@@ -59,7 +59,7 @@ app.get("/product/:product_id", getProductData, (req: any, res: any) => {
 // crear producto
 app.post("/createProduct", createProductData);
 //actualizar producto
-app.put("/products/:id", authenticateToken, updateProduct);
+app.put("/product/:id", authenticateToken, updateProduct);
 // eliminar producto
 app.delete("/deleteProduct", deleteProduct);
 
