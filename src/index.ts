@@ -36,6 +36,7 @@ import { login, register } from "./controllers/authController";
 import { ping, getUsuarios } from "./controllers/othersController";
 import { authenticateToken } from "./token/authtoken";
 import { getProfileInfo } from "./controllers/profileController";
+import { createProduct,updateProduct,deleteProduct,getAllProducts } from "./controllers/productController";
 // con base al token obtenemos la info necesaria
 const getProfileData = [authenticateToken, getProfileInfo];
 //configuramos las rutas con su debida funcion y metodo
@@ -47,6 +48,10 @@ app.post("/register", register);
 app.get("/ping", ping);
 app.get("/usuarios", getUsuarios);
 
+// rutas de productos
+app.post("/createProduct", createProduct);
+app.post("/updateProduct", updateProduct);
+app.delete("/deleteProduct", deleteProduct);
 
 //rutas para el acceso de informacion del perfil
 app.get("/perfil", getProfileData, (req: any, res: any) => {
