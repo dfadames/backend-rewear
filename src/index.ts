@@ -36,10 +36,11 @@ import { login, register } from "./controllers/authController";
 import { ping, getUsuarios } from "./controllers/othersController";
 import { authenticateToken } from "./token/authtoken";
 import { getProfileInfo } from "./controllers/profileController";
-import { createProduct,updateProduct,deleteProduct,getAllProducts } from "./controllers/productController";
+import { createProduct,updateProduct,deleteProduct,getAllProducts,getProductInfo } from "./controllers/productController";
 // con base al token obtenemos la info necesaria
 const getProfileData = [authenticateToken, getProfileInfo];
 const createProductData = [authenticateToken, createProduct];
+const getProductData = [getProductInfo];
 //configuramos las rutas con su debida funcion y metodo
 //rutas de autenticacion de credenciales
 app.post("/login", login);
@@ -48,10 +49,18 @@ app.post("/register", register);
 //rutas de funcionalidades varias:
 app.get("/ping", ping);
 app.get("/usuarios", getUsuarios);
+// Middleware para obtener la información del producto
 
 // rutas de productos
+// obtener informacion
+app.get("/product/:product_id", getProductData, (req: any, res: any) => {
+  res.json(req.body.productInfo);
+});
+// crear producto
 app.post("/createProduct", createProductData);
+//actualizar producto
 app.post("/updateProduct", updateProduct);
+// eliminar producto
 app.delete("/deleteProduct", deleteProduct);
 
 //rutas para el acceso de informacion del perfil
@@ -59,6 +68,7 @@ app.get("/perfil", getProfileData, (req: any, res: any) => {
   res.json(req.body.profileInfo[0]);
 });
 
+app.get("/getAllProducts", getAllProducts);
 //saca la base de datos
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

@@ -2,11 +2,9 @@
 import { executeQuery } from "../db/models/queryModel";
 
 
-export const getProductInfo = (req: any, res: any) => {
-  // Obtenemos el ID del usuario autenticado
-  const seller_id = req.user.id;
-
-  // Obtenemos el ID del producto desde los parámetros de la consulta
+//Obtener información de un producto específico
+export const getProductInfo = (req: any, res: any, next: any) => {
+  // Extraemos el ID del producto desde los parámetros de la URL
   const { product_id } = req.params;
 
   // Validamos que el ID del producto haya sido proporcionado
@@ -14,22 +12,24 @@ export const getProductInfo = (req: any, res: any) => {
     return res.status(400).json({ error: "El ID del producto es obligatorio" });
   }
 
-  // Consulta SQL para obtener la información del producto que pertenece al usuario autenticado
-  const query = "SELECT * FROM product WHERE id = ? AND seller_id = ?";
+  // Consulta SQL para obtener la información del producto
+  const query = "SELECT * FROM product WHERE id = ?";
 
-  executeQuery(query, [product_id, seller_id], (err: any, results: any) => {
+  // Ejecutamos la consulta con `executeQuery`
+  executeQuery(query, [product_id], (err: any, results: any) => {
     if (err) {
       console.error("Error al obtener la información del producto:", err);
       return res.status(500).json({ error: "Error interno del servidor" });
     }
 
-    // Verificamos si el producto existe y pertenece al usuario
+    // Verificamos si el producto existe
     if (results.length === 0) {
-      return res.status(404).json({ error: "Producto no encontrado o no pertenece al usuario" });
+      return res.status(404).json({ error: "Producto no encontrado" });
     }
 
-    // Devolvemos la información del producto
-    res.json(results[0]);
+    // Almacenamos la información del producto en req.body y continuamos
+    req.body.productInfo = results[0];
+    next();
   });
 };
 
