@@ -59,7 +59,7 @@ app.get("/product/:product_id", getProductData, (req: any, res: any) => {
 // crear producto
 app.post("/createProduct", createProductData);
 //actualizar producto
-app.post("/updateProduct", updateProduct);
+app.put("/products/:id", authenticateToken, updateProduct);
 // eliminar producto
 app.delete("/deleteProduct", deleteProduct);
 
@@ -67,6 +67,9 @@ app.delete("/deleteProduct", deleteProduct);
 app.get("/perfil", getProfileData, (req: any, res: any) => {
   res.json(req.body.profileInfo[0]);
 });
+
+
+
 
 app.get("/getAllProducts", getAllProducts);
 //saca la base de datos
