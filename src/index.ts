@@ -37,6 +37,7 @@ import { ping, getUsuarios } from "./controllers/othersController";
 import { authenticateToken } from "./token/authtoken";
 import { getProfileInfo } from "./controllers/profileController";
 import { createProduct,updateProduct,deleteProduct,getAllProducts,getProductInfo } from "./controllers/productController";
+import {getProductsByName} from "./controllers/searchProducts";
 // con base al token obtenemos la info necesaria
 const getProfileData = [authenticateToken, getProfileInfo];
 const createProductData = [authenticateToken, createProduct];
@@ -62,15 +63,14 @@ app.post("/createProduct", createProductData);
 app.put("/product/:id", authenticateToken, updateProduct);
 // eliminar producto
 app.delete("/product/:id", authenticateToken, deleteProduct);
-
 //rutas para el acceso de informacion del perfil
 app.get("/perfil", getProfileData, (req: any, res: any) => {
   res.json(req.body.profileInfo[0]);
 });
 
-
-
-
+//rutas de busqueda de productos
+app.get("/search", getProductsByName);
+//ruta para obtener todos los productos
 app.get("/products", getAllProducts);
 //saca la base de datos
 app.listen(PORT, () => {
