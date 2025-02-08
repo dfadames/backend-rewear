@@ -2,7 +2,7 @@
 import { executeQuery } from "../db/models/queryModel";
 
 // crear producto
-export const createProduct = (req, res) => {
+export const createProduct = (req: any, res: any) => {
   // Extraemos los datos del cuerpo de la petición
   const { name_product, category, price, description, status, publication_status } = req.body;
   // Obtenemos el ID del vendedor desde el usuario autenticado
@@ -21,7 +21,7 @@ export const createProduct = (req, res) => {
   const query = "INSERT INTO product (seller_id, name_product, category, price, description, status, publication_status, publication_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
   // Ejecutamos la consulta pasando los parámetros
-  executeQuery(query, [seller_id, name_product, category, price, description, status, pubStatus, publication_date], (err, results) => {
+  executeQuery(query, [seller_id, name_product, category, price, description, status, pubStatus, publication_date], (err: any , results: any) => {
     if (err) {
       console.error("Error al crear el producto:", err);
       return res.status(500).json({ error: "Error interno del servidor" });
@@ -38,7 +38,7 @@ export const createProduct = (req, res) => {
 
 
 // Update producto
-export const updateProduct = (req, res) => {
+export const updateProduct = (req: any, res: any) => {
   // Extraemos el ID del producto desde los parámetros de la URL
   const productId = req.params.id;
   
@@ -67,7 +67,7 @@ export const updateProduct = (req, res) => {
   `;
   
   // Ejecutamos la consulta pasando los parámetros correspondientes
-  executeQuery(query, [name_product, category, price, description, status, pubStatus, productId, seller_id], (err, results) => {
+  executeQuery(query, [name_product, category, price, description, status, pubStatus, productId, seller_id], (err: any, results : any) => {
     if (err) {
       console.error("Error al actualizar el producto:", err);
       return res.status(500).json({ error: "Error interno del servidor" });
@@ -84,7 +84,7 @@ export const updateProduct = (req, res) => {
 
 
 // Delete producto
-export const deleteProduct = (req, res) => {
+export const deleteProduct = (req: any, res: any) => {
   // Extraemos el ID del producto desde los parámetros de la URL
   const productId = req.params.id;
 
@@ -95,7 +95,7 @@ export const deleteProduct = (req, res) => {
   const query = "DELETE FROM product WHERE id = ? AND seller_id = ?";
 
   // Ejecutamos la consulta pasando el ID del producto y el seller_id
-  executeQuery(query, [productId, seller_id], (err, results) => {
+  executeQuery(query, [productId, seller_id], (err: any, results: any) => {
     if (err) {
       console.error("Error al eliminar el producto:", err);
       return res.status(500).json({ error: "Error interno del servidor" });
@@ -113,12 +113,12 @@ export const deleteProduct = (req, res) => {
 
 
 // Get all productos
-export const getAllProducts = (req, res) => {
+export const getAllProducts = (req: any, res: any) => {
   // Preparamos la consulta SQL para obtener todos los productos
   const query = "SELECT * FROM product";
 
   // Ejecutamos la consulta
-  executeQuery(query, [], (err, results) => {
+  executeQuery(query, [], (err: any, results: any) => {
     if (err) {
       console.error("Error al obtener los productos:", err);
       return res.status(500).json({ error: "Error interno del servidor" });
