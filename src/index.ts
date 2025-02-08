@@ -71,7 +71,7 @@ app.get("/perfil", getProfileData, (req: any, res: any) => {
 
 
 
-app.get("/getAllProducts", getAllProducts);
+app.get("/products", getAllProducts);
 //saca la base de datos
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
