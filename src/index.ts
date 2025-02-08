@@ -61,7 +61,7 @@ app.post("/createProduct", createProductData);
 //actualizar producto
 app.put("/product/:id", authenticateToken, updateProduct);
 // eliminar producto
-app.delete("/deleteProduct", deleteProduct);
+app.delete("/product/:id", authenticateToken, deleteProduct);
 
 //rutas para el acceso de informacion del perfil
 app.get("/perfil", getProfileData, (req: any, res: any) => {
