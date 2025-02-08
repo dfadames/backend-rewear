@@ -5,25 +5,26 @@ import bcrypt from "bcrypt";
 
 const jwt = require("jsonwebtoken"); // Importa la biblioteca jsonwebtoken
 import db from "../db/dbConfig";
+
 //importamos la clave secreta
 import { secretKey } from "../token/authtoken";
 import { executeQuery } from "../db/models/queryModel";
 
 //se realiza una peticion post que recibe contraseña y usuario y devuelve un token de sesion
 export const login = (req: Request, res: Response) => {
-  const { email, password } = req.body;
+  const { username, password } = req.body;
 
   // Consulta para obtener el usuario por su nombre de usuario
-  const query = "SELECT * FROM USER WHERE email = ?";
+  const query = "SELECT * FROM user WHERE username = ?";
 
-  executeQuery(query, [email], async (err: Error, results: any) => {
+  executeQuery(query, [username], async (err: Error, results: any) => {
     if (err) {
       return res.status(500).json({ error: "Error interno del servidor" });
     }
 
     //si devuelve solo la consulta (1 parametro) la consulta eesta bien, de lo contrario no esta
     if (results.length != 1) {
-      console.log(`Intento de login fallido: usuario no encontrado (${email})`);
+      console.log(`Intento de login fallido: usuario no encontrado (${username})`);
       return res.status(401).json({ error: "Credenciales incorrectas" });
     }
 
@@ -34,13 +35,13 @@ export const login = (req: Request, res: Response) => {
       const isPasswordValid = await bcrypt.compare(password, user.password);
 
       if (!isPasswordValid) {
-        console.log(`Intento de login fallido: contraseña incorrecta (${email})`);
+        console.log(`Intento de login fallido: contraseña incorrecta (${username})`);
         return res.status(401).json({ error: "Credenciales incorrectas" });
       }
 
       //Genera un token JWT si la contraseña es válida
-      const token = jwt.sign({ email: user.email }, secretKey);
-      console.log(`Intento de login exitoso: ${email}`);
+      const token = jwt.sign({ username: user.username }, secretKey);
+      console.log(`Intento de login exitoso: ${username}`);
       res.status(200).json({ token });
     } catch (error) {
       console.error("Error al verificar la contraseña: ", error);
@@ -51,7 +52,7 @@ export const login = (req: Request, res: Response) => {
 
 //se realiza una peticion para insertar datos en la base de datos
 export const register = async (req: Request, res: Response) => {
-  const {first_name,last_name,phone,email, password, role } = req.body;
+  const {email,username,password} = req.body;
 
   try {
     // Genera una sal y hashea la contraseña
@@ -59,9 +60,9 @@ export const register = async (req: Request, res: Response) => {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     const registration_date = new Date();
     const query =
-      "INSERT INTO USER (first_name,last_name,phone,registration_date,email, password ) VALUES (?, ?, ?,?,?,?)";
+      "INSERT INTO user (email,username,password) VALUES (?, ?, ?)";
 
-    executeQuery(query, [first_name,last_name,phone,registration_date,email, hashedPassword, role], (err: Error) => {
+    executeQuery(query, [registration_date,email, hashedPassword], (err: Error) => {
       if (err) {
         const errorMessage = "" + err;
         if (errorMessage.includes("Duplicate")) {
@@ -73,8 +74,8 @@ export const register = async (req: Request, res: Response) => {
           res.status(500).json({ error: "Error interno del servidor" });
         }
       } else {
-        console.log("Usuario creado: " + email);
-        const user = { email: email};
+        console.log("Usuario creado: " + username);
+        const user = { username: username};
         const token = jwt.sign(user, secretKey);
         res.status(200).json({ token });
       }

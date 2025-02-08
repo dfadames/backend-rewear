@@ -9,8 +9,7 @@ export const ping = (req: any, res: any) => {
 
 // solicita la tabla usuarios de la base de datos
 export const getUsuarios = (req: any, res: any) => {
-  const query = "SELECT * FROM USER";
-
+  const query = "SELECT * FROM user";
   executeQuery(query, [], (error: Error, results: any) => {
     if (error) {
       res.status(500).send("Error interno del servidor");
@@ -19,3 +18,4 @@ export const getUsuarios = (req: any, res: any) => {
     }
   });
 };
+//entra por la api -> endpoint -> controller -> model -> db
