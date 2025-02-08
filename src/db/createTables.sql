@@ -1,74 +1,97 @@
 CREATE DATABASE rewear;
 USE rewear;
 
+/* Tabla de usuarios */
 CREATE TABLE user (
-  id int PRIMARY KEY NOT NULL auto_increment,
-  username VARCHAR(50) NOT NULL,
-  first_name varchar(50) NOT NULL,
-  last_name varchar(50) NOT NULL,
-  phone varchar(15) NOT NULL,
-  registration_date date NOT NULL,
-  email varchar(100) UNIQUE NOT NULL,
-  password char(255) NOT NULL
+  id INT NOT NULL AUTO_INCREMENT,
+  email VARCHAR(100) UNIQUE NOT NULL,
+  username VARCHAR(50) UNIQUE NOT NULL,
+  password CHAR(255) NOT NULL,
+  registration_date DATE NOT NULL,
+  PRIMARY KEY (id)
 );
 
+/* Tabla de productos */
 CREATE TABLE product (
-  id int PRIMARY KEY NOT NULL auto_increment,
-  seller_id int NOT NULL,
-  name varchar(50) NOT NULL,
-  brand varchar(50),
-  category varchar(50) NOT NULL,
-  color varchar(50) NOT NULL,
-  status enum('available','out_of_stock') NOT NULL DEFAULT 'available',
-  price decimal(10,2) NOT NULL,
-  publication_date date NOT NULL,
-  #payment_details varchar(255) NOT NULL, //ya esta ubicada en payment_method
-  publication_status enum('draft','published','archived')
+  id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  seller_id INT NOT NULL,
+  name_product VARCHAR(50) NOT NULL,
+  category VARCHAR(50) NOT NULL,
+  price DECIMAL(10,2) NOT NULL,
+  description VARCHAR(400),
+  status INT NOT NULL,
+  publication_status ENUM('available','out_of_stock') NOT NULL DEFAULT 'available',
+  publication_date DATE NOT NULL,
+  CONSTRAINT fk_product_user
+    FOREIGN KEY (seller_id)
+    REFERENCES user(id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 );
 
+/* Tabla de reseñas */
 CREATE TABLE reviews (
-  id int PRIMARY KEY NOT NULL auto_increment,
-  product_id int NOT NULL,
-  user_id int NOT NULL,
-  comment varchar(400),
-  rating int NOT NULL,
-  comment_date date NOT NULL
+  id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  product_id INT NOT NULL,
+  user_id INT NOT NULL,
+  comment VARCHAR(400),
+  rating INT NOT NULL,
+  comment_date DATE NOT NULL,
+  CONSTRAINT fk_reviews_product
+    FOREIGN KEY (product_id)
+    REFERENCES product(id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT fk_reviews_user
+    FOREIGN KEY (user_id)
+    REFERENCES user(id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 );
 
+/* Tabla de transacciones */
 CREATE TABLE transaction (
-  id int PRIMARY KEY NOT NULL auto_increment,
-  product_id int NOT NULL,
-  buyer_id int NOT NULL,
-  transaction_date date NOT NULL,
-  payment_method varchar(50) NOT NULL,
-  total_amount int NOT NULL,
-  transaction_status enum('pending','completed','cancelled')
+  id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  product_id INT NOT NULL,
+  buyer_id INT NOT NULL,
+  transaction_date DATE NOT NULL,
+  payment_method VARCHAR(50) NOT NULL,
+  total_amount INT NOT NULL,
+  transaction_status ENUM('pending','completed','cancelled'),
+  CONSTRAINT fk_transaction_product
+    FOREIGN KEY (product_id)
+    REFERENCES product(id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT fk_transaction_buyer
+    FOREIGN KEY (buyer_id)
+    REFERENCES user(id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 );
 
+/* Tabla de métodos de pago */
 CREATE TABLE payment_method (
-  id int PRIMARY KEY NOT NULL auto_increment,
-  user_id int NOT NULL,
-  payment_type enum('credit_card','paypal','bank_transfer') NOT NULL,
-  payment_details text NOT NULL
+  id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  user_id INT NOT NULL,
+  payment_type ENUM('credit_card','paypal','bank_transfer') NOT NULL,
+  payment_details TEXT NOT NULL,
+  CONSTRAINT fk_payment_method_user
+    FOREIGN KEY (user_id)
+    REFERENCES user(id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 );
 
+/* Tabla de imágenes de productos */
 CREATE TABLE product_image (
-  id int PRIMARY KEY NOT NULL auto_increment,
-  image_id varchar(255) NOT NULL,
-  product_id int NOT NULL,
-  image_url varchar(255) NOT NULL
+  id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  image_id VARCHAR(255) NOT NULL,
+  product_id INT NOT NULL,
+  image_url VARCHAR(255) NOT NULL,
+  CONSTRAINT fk_product_image_product
+    FOREIGN KEY (product_id)
+    REFERENCES product(id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 );
-
-ALTER TABLE PRODUCT ADD FOREIGN KEY (seller_id) REFERENCES USER (id);
-
-ALTER TABLE reviews ADD FOREIGN KEY (product_id) REFERENCES PRODUCT (id);
-
-ALTER TABLE reviews ADD FOREIGN KEY (user_id) REFERENCES USER (id);
-
-ALTER TABLE transaction ADD FOREIGN KEY (product_id) REFERENCES PRODUCT (id);
-
-ALTER TABLE transaction ADD FOREIGN KEY (buyer_id) REFERENCES USER (id);
-
-ALTER TABLE payment_method ADD FOREIGN KEY (user_id) REFERENCES USER (id);
-
-ALTER TABLE product_image ADD FOREIGN KEY (product_id) REFERENCES PRODUCT (id);1
