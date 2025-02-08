@@ -20,7 +20,8 @@ app.use(express.json());
 
 //config de cors para permitir peticiones
 const corsOptions = {
-  origin: ['http://localhost:3000', 'https://frontend-re-wear.vercel.app/'], 
+  origin: true, // Permite cualquier origen
+  //origin: ['http://localhost:3000', 'https://frontend-re-wear.vercel.app/'],  // origenes reales
   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos permitidos
   allowedHeaders: ['Content-Type', 'Authorization'], // Cabeceras permitidas
 };
