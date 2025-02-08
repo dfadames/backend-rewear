@@ -160,7 +160,30 @@ export const deleteProduct = (req: any, res: any) => {
   });
 };
 
+// obtenemos prouctos de un vendedor
+export const getProductsBySeller = (req: any, res: any) => {
+  // Extraemos el ID del vendedor desde el cuerpo de la petición
+  const { seller_id } = req.body;
 
+  // Validamos que el seller_id esté presente
+  if (!seller_id) {
+    return res.status(400).json({ error: "El ID del vendedor es obligatorio" });
+  }
+
+  // Preparamos la consulta SQL para obtener los productos del vendedor específico
+  const query = "SELECT * FROM product WHERE seller_id = ?";
+
+  // Ejecutamos la consulta pasando el ID del vendedor
+  executeQuery(query, [seller_id], (err: any, results: any) => {
+    if (err) {
+      console.error("Error al obtener los productos del vendedor:", err);
+      return res.status(500).json({ error: "Error interno del servidor" });
+    }
+
+    // Devolvemos los resultados obtenidos
+    res.status(200).json(results);
+  });
+};
 
 // Get all productos
 export const getAllProducts = (req: any, res: any) => {
