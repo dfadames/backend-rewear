@@ -16,8 +16,11 @@ import { executeQuery } from "../db/models/queryModel";
 export const login = (req: Request, res: Response) => {
   const { username, password } = req.body;
 
-  // Consulta para obtener el usuario por su nombre de usuario
-  const query = "SELECT * FROM user WHERE username = ?";
+  // Consulta para obtener el usuario por su nombre de usuario, en caso de contener un @ lo hace con el gmail
+  const query = username.includes("@") 
+  ? "SELECT * FROM user WHERE email = ?" 
+  : "SELECT * FROM user WHERE username = ?";
+  
 
   executeQuery(query, [username], async (err: Error, results: any) => {
     if (err) {
