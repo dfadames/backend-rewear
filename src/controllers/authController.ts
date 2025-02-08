@@ -64,7 +64,7 @@ export const register = async (req: Request, res: Response) => {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     const registration_date = new Date();
     const query =
-      "INSERT INTO user (first_name, last_names, phone, username,email,password) VALUES (?, ?, ?, ?, ?, ?)";
+      "INSERT INTO user (first_name, last_names, phone, username, emaixl, password, registration_date) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
     executeQuery(query, [registration_date,email, hashedPassword], (err: Error) => {
       if (err) {
