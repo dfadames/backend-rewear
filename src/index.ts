@@ -35,7 +35,7 @@ const PORT = process.env.PORT;
 import { login, register } from "./controllers/authController";
 import { ping, getUsuarios } from "./controllers/othersController";
 import { authenticateToken } from "./token/authtoken";
-import { getProfileInfo, getUserProfileByUsername , getUserProfileById} from "./controllers/profileController";
+import { getProfileInfo, getUserProfileByUsername , getUserProfileById, getuseridByUsername} from "./controllers/profileController";
 import { createProduct,updateProduct,deleteProduct,getAllProducts,getProductInfo, getProductsBySeller } from "./controllers/productController";
 import {getProductsByName} from "./controllers/searchProducts";
 import {getProductsByFilters} from "./controllers/productSearchFilter";
@@ -75,6 +75,8 @@ app.get("/perfil", getProfileData, (req: any, res: any) => {
 });
 //perfilexterno
 app.post("/perfilexterno", getUserProfileById);
+//Obtener id de username
+app.post("/idexterno", getuseridByUsername);
 //perfilexterno general
 app.get("/user/:username", getUserProfileByUsername);
 
