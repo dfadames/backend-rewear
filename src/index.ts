@@ -35,7 +35,7 @@ const PORT = process.env.PORT;
 import { login, register } from "./controllers/authController";
 import { ping, getUsuarios } from "./controllers/othersController";
 import { authenticateToken } from "./token/authtoken";
-import { getProfileInfo, getUserProfileByUsername } from "./controllers/profileController";
+import { getProfileInfo, getUserProfileByUsername , getUserProfileById} from "./controllers/profileController";
 import { createProduct,updateProduct,deleteProduct,getAllProducts,getProductInfo } from "./controllers/productController";
 import {getProductsByName} from "./controllers/searchProducts";
 import {getProductsByFilters} from "./controllers/productSearchFilter";
@@ -68,6 +68,8 @@ app.delete("/product/:id", authenticateToken, deleteProduct);
 app.get("/perfil", getProfileData, (req: any, res: any) => {
   res.json(req.body.profileInfo[0]);
 });
+//perfilexterno
+app.post("/userexterno", getUserProfileById);
 //perfilexterno
 app.get("/user/:username", getUserProfileByUsername);
 
