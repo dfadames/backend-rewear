@@ -13,8 +13,20 @@ export const getProductInfo = (req: any, res: any, next: any) => {
   }
 
   // Consulta SQL para obtener la información del producto
-  const query = "SELECT * FROM product WHERE id = ?";
-
+  const query = `
+  SELECT 
+    product.id as idproduct, 
+    product.seller_id, 
+    user.username, 
+    name_product, 
+    product.price, 
+    product.description, 
+    product.category, 
+    product.status 
+  FROM product 
+  INNER JOIN user 
+    ON user.id = product.seller_id 
+  WHERE id = ?`;
   // Ejecutamos la consulta con `executeQuery`
   executeQuery(query, [product_id], (err: any, results: any) => {
     if (err) {
