@@ -13,8 +13,8 @@ export const getProductsByFilters = (req, res) => {
     
     // Preparamos los filtros para usar en la consulta
     // Si se proporciona product_name o category, se usan comodines para búsquedas parciales.
-    const searchName = product_name ? `%${product_name}%` : '%';
-    const searchCategory = category ? `%${category}%` : '%';
+    const searchName = product_name ? `%${product_name}%` : '%%';
+    const searchCategory = category ? `%${category}%` : '%%';
     // Para price y status, asumimos que se buscan productos con precio mayor o igual al valor dado
     // y status mayor o igual al valor dado.
     // Si no se proporcionan, se puede usar un valor por defecto (por ejemplo, 0)
