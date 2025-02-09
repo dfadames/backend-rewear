@@ -26,7 +26,7 @@ export const getProductInfo = (req: any, res: any, next: any) => {
   FROM product 
   INNER JOIN user 
     ON user.id = product.seller_id 
-  WHERE id = ?`;
+  WHERE product.id = ?`;
   // Ejecutamos la consulta con `executeQuery`
   executeQuery(query, [product_id], (err: any, results: any) => {
     if (err) {
