@@ -24,11 +24,13 @@ export const getProductsByFilters = (req:any, res:any) => {
     const query = `
       SELECT * FROM product 
       WHERE name_product LIKE ? 
-      AND category LIKE ?
+      AND category LIKE ? 
+      AND price >= ? 
+      AND status >= ?
     `;
   
     // Ejecutamos la consulta con los filtros
-    executeQuery(query, [searchName, searchCategory], (err:any, results:any) => {
+    executeQuery(query, [searchName, searchCategory, filterPrice, filterStatus], (err:any, results:any) => {
       if (err) {
         console.error("Error al obtener la información del producto:", err);
         return res.status(500).json({ error: "Error interno del servidor" });
