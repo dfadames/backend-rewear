@@ -12,7 +12,7 @@ export const getProductsByName = (req:any, res:any) => {
   }
 
   // Construimos la consulta SQL para buscar productos cuyo nombre contenga la cadena proporcionada
-  const query = "SELECT name_product, description FROM product WHERE name_product LIKE ?";
+  const query = "SELECT * FROM product WHERE name_product LIKE ?";
   const searchName = `%${product_name}%`;
 
   // Ejecutamos la consulta
