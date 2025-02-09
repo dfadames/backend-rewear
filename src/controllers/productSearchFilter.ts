@@ -4,16 +4,15 @@ import { executeQuery } from "../db/models/queryModel";
 // Obtener información de todos los productos con filtros //
 export const getProductsByFilters = (req:any, res:any) => {
     // Extraemos los filtros desde los query parameters
-    const { product_name, category, price, status } = req.body; //toca cambiar esta vuelta a query
+    const {category, price, status } = req.body; //toca cambiar esta vuelta a query
     
     // Validamos que se haya proporcionado al menos un filtro
-    if (!product_name && !category && !price && !status) {
+    if (!category && !price && !status) {
       return res.status(400).json({ error: "Al menos un filtro es obligatorio" });
     }
     
     // Preparamos los filtros para usar en la consulta
-    // Si se proporciona product_name o category, se usan comodines para búsquedas parciales.
-    const searchName = product_name ? `%${product_name}%` : '%%';
+    // Si se proporciona category, se usan comodines para búsquedas parciales.
     const searchCategory = category ? `%${category}%` : '%%';
     // Para price y status, asumimos que se buscan productos con precio mayor o igual al valor dado
     // y status mayor o igual al valor dado.
@@ -23,14 +22,13 @@ export const getProductsByFilters = (req:any, res:any) => {
     // Construimos la consulta SQL con los filtros
     const query = `
       SELECT * FROM product 
-      WHERE name_product LIKE ? 
-      AND category LIKE ? 
+      WHERE category LIKE ? 
       AND price <= ? 
       AND status >= ?
     `;
   
     // Ejecutamos la consulta con los filtros
-    executeQuery(query, [searchName, searchCategory, filterPrice, filterStatus], (err:any, results:any) => {
+    executeQuery(query, [searchCategory, filterPrice, filterStatus], (err:any, results:any) => {
       if (err) {
         console.error("Error al obtener la información del producto:", err);
         return res.status(500).json({ error: "Error interno del servidor" });
