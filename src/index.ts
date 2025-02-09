@@ -35,7 +35,7 @@ const PORT = process.env.PORT;
 import { login, register } from "./controllers/authController";
 import { ping, getUsuarios } from "./controllers/othersController";
 import { authenticateToken } from "./token/authtoken";
-import { getProfileInfo, getUserProfileById } from "./controllers/profileController";
+import { getProfileInfo, getUserProfileByUsername } from "./controllers/profileController";
 import { createProduct,updateProduct,deleteProduct,getAllProducts,getProductInfo } from "./controllers/productController";
 import {getProductsByName} from "./controllers/searchProducts";
 // con base al token obtenemos la info necesaria
@@ -68,7 +68,7 @@ app.get("/perfil", getProfileData, (req: any, res: any) => {
   res.json(req.body.profileInfo[0]);
 });
 //perfilexterno
-app.post("/perfilexterno", getUserProfileById);
+app.get("/user/:username", getUserProfileByUsername);
 
 
 //rutas de busqueda de productos
