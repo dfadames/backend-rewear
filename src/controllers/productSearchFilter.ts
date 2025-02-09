@@ -1,20 +1,37 @@
-
 // Importamos la función para ejecutar consultas en la base de datos
 import { executeQuery } from "../db/models/queryModel";
 
 // Obtener información de todos los productos con filtros //
-export const getProductsByFilters = (req:any, res:any) => {
+export const getProductsByFilters = (req, res) => {
     // Extraemos los filtros desde los query parameters
-    const {product_name, category, price, status } = req.body;
+    const { product_name, category, price, status } = req.body;
     
     // Validamos que se haya proporcionado al menos un filtro
     if (!product_name && !category && !price && !status) {
       return res.status(400).json({ error: "Al menos un filtro es obligatorio" });
     }
-    // Construimos la consulta SQL para buscar productos con los filtros proporcionados
-    let query = "SELECT * FROM product WHERE name_product LIKE ? AND category LIKE ? AND price >= ? AND status >= ?";
+    
+    // Preparamos los filtros para usar en la consulta
+    // Si se proporciona product_name o category, se usan comodines para búsquedas parciales.
+    const searchName = product_name ? `%${product_name}%` : '%';
+    const searchCategory = category ? `%${category}%` : '%';
+    // Para price y status, asumimos que se buscan productos con precio mayor o igual al valor dado
+    // y status mayor o igual al valor dado.
+    // Si no se proporcionan, se puede usar un valor por defecto (por ejemplo, 0)
+    const filterPrice = price ? price : 0;
+    const filterStatus = status ? status : 0;
   
-    executeQuery(query, [product_name, category, price, status], (err:any, results:any) => {
+    // Construimos la consulta SQL con los filtros
+    const query = `
+      SELECT * FROM product 
+      WHERE name_product LIKE ? 
+      AND category LIKE ? 
+      AND price >= ? 
+      AND status >= ?
+    `;
+  
+    // Ejecutamos la consulta con los filtros
+    executeQuery(query, [searchName, searchCategory, filterPrice, filterStatus], (err, results) => {
       if (err) {
         console.error("Error al obtener la información del producto:", err);
         return res.status(500).json({ error: "Error interno del servidor" });
@@ -27,4 +44,4 @@ export const getProductsByFilters = (req:any, res:any) => {
   
       res.status(200).json({ productInfo: results });
     });
-  };
+};
