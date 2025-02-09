@@ -36,7 +36,7 @@ import { login, register } from "./controllers/authController";
 import { ping, getUsuarios } from "./controllers/othersController";
 import { authenticateToken } from "./token/authtoken";
 import { getProfileInfo, getUserProfileByUsername , getUserProfileById} from "./controllers/profileController";
-import { createProduct,updateProduct,deleteProduct,getAllProducts,getProductInfo } from "./controllers/productController";
+import { createProduct,updateProduct,deleteProduct,getAllProducts,getProductInfo, getProductsBySeller } from "./controllers/productController";
 import {getProductsByName} from "./controllers/searchProducts";
 import {getProductsByFilters} from "./controllers/productSearchFilter";
 // con base al token obtenemos la info necesaria
@@ -53,7 +53,8 @@ app.get("/ping", ping);
 app.get("/usuarios", getUsuarios);
 // Middleware para obtener la información del producto
 
-// rutas de productos
+//-------------------------------------------------------------------------
+//PRODUCTOS
 // obtener informacion
 app.get("/product/:product_id", getProductData, (req: any, res: any) => {
   res.json(req.body.productInfo);
@@ -64,6 +65,10 @@ app.post("/createProduct", createProductData);
 app.put("/product/:id", authenticateToken, updateProduct);
 // eliminar producto
 app.delete("/product/:id", authenticateToken, deleteProduct);
+// obtener producto por usuario
+app.post("/productsuser", getProductsBySeller);
+//-------------------------------------------------------------------------
+//PERFIL
 //rutas para el acceso de informacion del perfil
 app.get("/perfil", getProfileData, (req: any, res: any) => {
   res.json(req.body.profileInfo[0]);
@@ -74,7 +79,8 @@ app.post("/perfilexterno", getUserProfileById);
 app.get("/user/:username", getUserProfileByUsername);
 
 
-//rutas de busqueda de productos
+//-------------------------------------------------------------------------
+//BUSQUEDA DE PRODUCTOS
 app.get("/search/:name", getProductsByName, (req: any, res: any) => {
   res.json(req.body.productInfo);
 });
