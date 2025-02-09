@@ -38,6 +38,7 @@ import { authenticateToken } from "./token/authtoken";
 import { getProfileInfo, getUserProfileByUsername } from "./controllers/profileController";
 import { createProduct,updateProduct,deleteProduct,getAllProducts,getProductInfo } from "./controllers/productController";
 import {getProductsByName} from "./controllers/searchProducts";
+import {getProductsByFilters} from "./controllers/productSearchFilter";
 // con base al token obtenemos la info necesaria
 const getProfileData = [authenticateToken, getProfileInfo];
 const createProductData = [authenticateToken, createProduct];
@@ -73,6 +74,8 @@ app.get("/user/:username", getUserProfileByUsername);
 
 //rutas de busqueda de productos
 app.get("/search", getProductsByName);
+//ruta para buscar productos con filtros
+app.get("/search/filter", getProductsByFilters);
 //ruta para obtener todos los productos
 app.get("/products", getAllProducts);
 //saca la base de datos

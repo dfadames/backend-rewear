@@ -4,7 +4,7 @@ import { executeQuery } from "../db/models/queryModel";
 // Obtener la información de varios productos por su nombre (usando query parameters)
 export const getProductsByName = (req:any, res:any) => {
   // Extraemos el nombre del producto desde los query parameters
-  const { product_name } = req.query;
+  const { product_name } = req.body;
 
   // Validamos que se haya proporcionado el nombre del producto
   if (!product_name) {
@@ -12,7 +12,7 @@ export const getProductsByName = (req:any, res:any) => {
   }
 
   // Construimos la consulta SQL para buscar productos cuyo nombre contenga la cadena proporcionada
-  const query = "SELECT name_product, description FROM product WHERE name_product LIKE ?";
+  const query = "SELECT * FROM product WHERE name_product LIKE ?";
   const searchName = `%${product_name}%`;
 
   // Ejecutamos la consulta
