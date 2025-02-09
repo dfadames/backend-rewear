@@ -73,9 +73,11 @@ app.get("/user/:username", getUserProfileByUsername);
 
 
 //rutas de busqueda de productos
-app.get("/search", getProductsByName);
+app.get("/search/:name", getProductsByName, (req: any, res: any) => {
+  res.json(req.body.productInfo);
+});
 //ruta para buscar productos con filtros
-app.get("/search/filter", getProductsByFilters);
+app.post("/search/filter", getProductsByFilters);
 //ruta para obtener todos los productos
 app.get("/products", getAllProducts);
 //saca la base de datos

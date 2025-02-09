@@ -4,7 +4,7 @@ import { executeQuery } from "../db/models/queryModel";
 // Obtener la información de varios productos por su nombre (usando query parameters)
 export const getProductsByName = (req:any, res:any) => {
   // Extraemos el nombre del producto desde los query parameters
-  const { product_name } = req.body;
+  const product_name =  req.params.name;
 
   // Validamos que se haya proporcionado el nombre del producto
   if (!product_name) {

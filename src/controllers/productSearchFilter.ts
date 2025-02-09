@@ -4,7 +4,7 @@ import { executeQuery } from "../db/models/queryModel";
 // Obtener información de todos los productos con filtros //
 export const getProductsByFilters = (req:any, res:any) => {
     // Extraemos los filtros desde los query parameters
-    const { product_name, category, price, status } = req.body;
+    const { product_name, category, price, status } = req.body; //toca cambiar esta vuelta a query
     
     // Validamos que se haya proporcionado al menos un filtro
     if (!product_name && !category && !price && !status) {
@@ -25,7 +25,7 @@ export const getProductsByFilters = (req:any, res:any) => {
       SELECT * FROM product 
       WHERE name_product LIKE ? 
       AND category LIKE ? 
-      AND price >= ? 
+      AND price <= ? 
       AND status >= ?
     `;
   
