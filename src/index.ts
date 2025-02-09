@@ -69,8 +69,8 @@ app.get("/perfil", getProfileData, (req: any, res: any) => {
   res.json(req.body.profileInfo[0]);
 });
 //perfilexterno
-app.post("/userexterno", getUserProfileById);
-//perfilexterno
+app.post("/perfilexterno", getUserProfileById);
+//perfilexterno general
 app.get("/user/:username", getUserProfileByUsername);
 
 
