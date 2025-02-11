@@ -12,8 +12,5 @@ const transporter = nodemailer.createTransport({
 });
 
 
-<<<<<<< HEAD
 export default transporter;
-=======
-export default transporter;
->>>>>>> 8e50a5c1efa41dd3847aa48187d9abeb5b02f6aa
+
