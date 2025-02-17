@@ -32,7 +32,7 @@ app.use(cors(corsOptions));
 const PORT = process.env.PORT;
 
 //importamos el direccionamiento de rutas:
-import { login, register } from "./controllers/authController";
+import { login, register, googleAuth } from "./controllers/authController";
 import { ping, getUsuarios } from "./controllers/othersController";
 import { authenticateToken } from "./token/authtoken";
 import { getProfileInfo, getUserProfileByUsername , getUserProfileById, getuseridByUsername} from "./controllers/profileController";
@@ -47,7 +47,7 @@ const getProductData = [getProductInfo];
 //rutas de autenticacion de credenciales
 app.post("/login", login);
 app.post("/register", register);
-
+app.post("/auth/google", googleAuth); // A
 //rutas de funcionalidades varias:
 app.get("/ping", ping);
 app.get("/usuarios", getUsuarios);
