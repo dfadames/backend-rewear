@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction, RequestHandler } from "express";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 import transporter from "../extra/mailController"; // Importamos el transporter
@@ -7,12 +7,12 @@ import transporter from "../extra/mailController"; // Importamos el transporter
 
 const jwt = require("jsonwebtoken"); // Importa la biblioteca jsonwebtoken
 import db from "../db/dbConfig";
-
+import { OAuth2Client } from "google-auth-library";
 //importamos la clave secreta
 import { secretKey } from "../token/authtoken";
 import { executeQuery } from "../db/models/queryModel";
-
-
+// google aotuh
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 //LOGIN
 //se realiza una peticion post que recibe contraseña y usuario y devuelve un token de sesion
 export const login = (req: Request, res: Response) => {
@@ -97,7 +97,76 @@ export const register = async (req: Request, res: Response) => {
 
 
 
+
 // recuperar contrasenas:
+// Función para ejecutar consultas de manera asíncrona
+const queryAsync = (query: string, params: any[]): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    executeQuery(query, params, (err: Error, results: any) => {
+      if (err) reject(err);
+      else resolve(results);
+    });
+  });
+};
+
+// Middleware de autenticación con Google
+export const googleAuth: RequestHandler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  const { token } = req.body;
+
+  if (!token) {
+    res.status(400).json({ error: "Falta el token de Google" });
+    return;
+  }
+
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+
+    if (!payload || !payload.email) {
+      res.status(400).json({ error: "Token de Google inválido o sin email" });
+      return;
+    }
+
+    const email = payload.email;
+    const first_name = payload.given_name || "";
+    const last_names = payload.family_name || "";
+    const username = email.split("@")[0];
+    const registration_date = new Date();
+
+    try {
+      // Verificar si el usuario ya existe
+      const results = await queryAsync("SELECT * FROM user WHERE email = ?", [email]);
+
+      let user: any;
+      if (results.length > 0) {
+        user = results[0]; // Usuario encontrado
+      } else {
+        // Insertar usuario si no existe
+        const dummyPassword = "";
+        await queryAsync(
+          "INSERT INTO user (first_name, last_names, phone, username, email, password, registration_date) VALUES (?, ?, ?, ?, ?, ?, ?)",
+          [first_name, last_names, "", username, email, dummyPassword, registration_date]
+        );
+
+        user = { username }; // Simular que el usuario fue creado
+      }
+
+      // Generar y enviar el token
+      const jwtToken = jwt.sign({ username: user.username }, secretKey);
+      res.status(200).json({ token: jwtToken });
+    } catch (dbError) {
+      console.error("Error en la base de datos:", dbError);
+      res.status(500).json({ error: "Error interno del servidor" });
+    }
+  } catch (authError) {
+    console.error("Error al verificar token de Google:", authError);
+    res.status(401).json({ error: "Token de Google inválido" });
+  }
+};
 
 // Función para generar un token aleatorio
 const generateResetToken = () => {

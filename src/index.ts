@@ -33,7 +33,8 @@ const PORT = process.env.PORT;
 
 //importamos el direccionamiento de rutas:
 
-import { login, register, resetPassword, updatePassword } from "./controllers/authController";
+
+import { login, register, resetPassword, updatePassword , googleAuth } from "./controllers/authController";
 import { ping, getUsuarios } from "./controllers/othersController";
 import { authenticateToken } from "./token/authtoken";
 import { getProfileInfo, getUserProfileByUsername , getUserProfileById, getuseridByUsername} from "./controllers/profileController";
@@ -48,7 +49,7 @@ const getProductData = [getProductInfo];
 //rutas de autenticacion de credenciales
 app.post("/login", login);
 app.post("/register", register);
-
+app.post("/auth/google", googleAuth); // A
 
 //-------------------------------------------------------------------------
 // RECUPERACIÓN DE CONTRASEÑA
