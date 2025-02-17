@@ -32,7 +32,8 @@ app.use(cors(corsOptions));
 const PORT = process.env.PORT;
 
 //importamos el direccionamiento de rutas:
-import { login, register } from "./controllers/authController";
+
+import { login, register, resetPassword, updatePassword } from "./controllers/authController";
 import { ping, getUsuarios } from "./controllers/othersController";
 import { authenticateToken } from "./token/authtoken";
 import { getProfileInfo, getUserProfileByUsername , getUserProfileById, getuseridByUsername} from "./controllers/profileController";
@@ -48,10 +49,13 @@ const getProductData = [getProductInfo];
 app.post("/login", login);
 app.post("/register", register);
 
-//rutas de funcionalidades varias:
-app.get("/ping", ping);
-app.get("/usuarios", getUsuarios);
-// Middleware para obtener la información del producto
+
+//-------------------------------------------------------------------------
+// RECUPERACIÓN DE CONTRASEÑA
+// Ruta para solicitar el envío del correo de recuperación (envía el token al email del usuario)
+app.post("/forgot-password", resetPassword);
+// Ruta para actualizar la contraseña una vez que el usuario envíe el nuevo password y el token
+app.post("/update-password", updatePassword);
 
 //-------------------------------------------------------------------------
 //PRODUCTOS
@@ -94,3 +98,11 @@ app.get("/products", getAllProducts);
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+
+//-------------------------------------------------------------------------
+//rutas de funcionalidades varias:
+app.get("/ping", ping);
+app.get("/usuarios", getUsuarios);
+// Middleware para obtener la información del producto
+
