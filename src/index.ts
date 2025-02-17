@@ -32,6 +32,7 @@ app.use(cors(corsOptions));
 const PORT = process.env.PORT;
 
 //importamos el direccionamiento de rutas:
+
 import { login, register, resetPassword, updatePassword } from "./controllers/authController";
 import { ping, getUsuarios } from "./controllers/othersController";
 import { authenticateToken } from "./token/authtoken";
@@ -48,12 +49,14 @@ const getProductData = [getProductInfo];
 app.post("/login", login);
 app.post("/register", register);
 
+
 //-------------------------------------------------------------------------
 // RECUPERACIÓN DE CONTRASEÑA
 // Ruta para solicitar el envío del correo de recuperación (envía el token al email del usuario)
 app.post("/forgot-password", resetPassword);
 // Ruta para actualizar la contraseña una vez que el usuario envíe el nuevo password y el token
 app.post("/update-password", updatePassword);
+
 //-------------------------------------------------------------------------
 //PRODUCTOS
 // obtener informacion
@@ -96,8 +99,10 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
+
 //-------------------------------------------------------------------------
 //rutas de funcionalidades varias:
 app.get("/ping", ping);
 app.get("/usuarios", getUsuarios);
 // Middleware para obtener la información del producto
+

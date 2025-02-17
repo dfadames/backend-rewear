@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 import transporter from "../extra/mailController"; // Importamos el transporter
-
 //importamos elementos necesarios
 // Importa la biblioteca jsonwebtoken
 
@@ -97,6 +96,7 @@ export const register = async (req: Request, res: Response) => {
 };
 
 
+
 // recuperar contrasenas:
 
 // Función para generar un token aleatorio
@@ -174,3 +174,4 @@ export const updatePassword = async (req: Request, res: Response) => {
     });
   });
 };
+
