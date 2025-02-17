@@ -132,7 +132,7 @@ export const resetPassword = (req: Request, res: Response) => {
       // Enviar email con el link de recuperación
       const resetLink = `https://frontend-re-wear.vercel.app/actualizarcontrasena?token=${resetToken}`;
       await transporter.sendMail({
-        from: '"rewear" <mailgun@sandbox9073f3078f8a440cafe6501fc21a258e.mailgun.org>',
+        from: '"rewear" <password@rewear.dadames.tech>',
         to: user.email,
         subject: "Recuperación de contraseña",
         text: `Hola ${user.username}, haz clic en el siguiente enlace para restablecer tu contraseña: ${resetLink}`,
