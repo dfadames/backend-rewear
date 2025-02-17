@@ -22,8 +22,7 @@ export function authenticateToken(req: any, res: any, next: any) {
 
     // Realiza una consulta SQL para obtener la id del usuario con el usuario obtenido del token
     const username = user.username;
-    const getUserIdSql =
-      "SELECT id_perfil FROM Usuario WHERE nombre_usuario = ?";
+    const getUserIdSql = "SELECT id FROM user WHERE username = ?";
 
     db.query(getUserIdSql, [username], (err: any, results: any) => {
       if (err) {
@@ -36,7 +35,8 @@ export function authenticateToken(req: any, res: any, next: any) {
         return res.status(404).send("Usuario no encontrado");
       }
 
-      req.user.id = results[0].id_perfil; // Agrega la id del usuario a req.user
+      req.user.id = results[0].id; // Agrega la id del usuario a req.user
+      console.log(req.user.id)
       next();
     });
   });
