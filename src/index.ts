@@ -39,6 +39,7 @@ import { ping, getUsuarios } from "./controllers/othersController";
 import { authenticateToken } from "./token/authtoken";
 import { getProfileInfo, getUserProfileByUsername , getUserProfileById, getuseridByUsername} from "./controllers/profileController";
 import { createProduct,updateProduct,deleteProduct,getAllProducts,getProductInfo, getProductsBySeller } from "./controllers/productController";
+import { addToCart, removeFromCart, getCart } from "./controllers/cartController";
 import {getProductsByName} from "./controllers/searchProducts";
 import {getProductsByFilters} from "./controllers/productSearchFilter";
 // con base al token obtenemos la info necesaria
@@ -100,6 +101,18 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
+// Importamos las rutas del carrito
+
+
+// Rutas para el carrito de compras
+// Agregar un producto al carrito
+app.post("/cart/add", authenticateToken, addToCart);
+
+// Eliminar un producto del carrito
+app.delete("/cart/remove", authenticateToken, removeFromCart);
+
+// Consultar el carrito del usuario
+app.get("/cart", authenticateToken, getCart);
 
 //-------------------------------------------------------------------------
 //rutas de funcionalidades varias:
