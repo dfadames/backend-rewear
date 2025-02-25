@@ -103,8 +103,8 @@ app.listen(PORT, () => {
 
 // Importamos las rutas del carrito
 
-
-// Rutas para el carrito de compras
+//-------------------------------------------------------------------------
+// CARRITO DE COMPRA
 // Agregar un producto al carrito
 app.post("/cart/add", authenticateToken, addToCart);
 
