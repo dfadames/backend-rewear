@@ -42,6 +42,8 @@ import { createProduct,updateProduct,deleteProduct,getAllProducts,getProductInfo
 import { addToCart, removeFromCart, getCart } from "./controllers/cartController";
 import {getProductsByName} from "./controllers/searchProducts";
 import {getProductsByFilters} from "./controllers/productSearchFilter";
+import { createPaymentPreference, mpWebhook, paymentSuccess, paymentFailure, paymentPending } from "./controllers/checkoutController";
+
 // con base al token obtenemos la info necesaria
 const getProfileData = [authenticateToken, getProfileInfo];
 const createProductData = [authenticateToken, createProduct];
@@ -113,6 +115,17 @@ app.delete("/cart/remove", authenticateToken, removeFromCart);
 
 // Consultar el carrito del usuario
 app.get("/cart", authenticateToken, getCart);
+
+//-------------------------------------------------------------------------
+// RUTAS DE MERCADO PAGO
+// Crear preferencia de pago
+app.post("/payment/create_preference", createPaymentPreference);
+// Webhook para notificaciones de Mercado Pago
+app.post("/payment/webhook", mpWebhook);
+// Redirecciones según el resultado del pago
+app.get("/payment/success", paymentSuccess);
+app.get("/payment/failure", paymentFailure);
+app.get("/payment/pending", paymentPending);
 
 //-------------------------------------------------------------------------
 //rutas de funcionalidades varias:
