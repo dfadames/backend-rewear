@@ -1,3 +1,4 @@
+import cloudinary from "cloudinary";
 import { executeQuery } from "../db/models/queryModel";
 
 export const getProfileInfo = (req: any, res: any, next: any) => {
@@ -107,3 +108,43 @@ export const getUserProfileByUsername = (req: any, res: any) => {
     res.status(200).json(results[0]);
   });
 };
+
+/*
+// Actualizar la imagen de perfil
+export const updateProfileImage = async (req: any, res: any) => {
+  try {
+    const userId = req.user.id; // Se asume que el usuario autenticado está en req.user
+
+    // Verificar que se envió un archivo de imagen
+    if (!req.files || !req.files.image) {
+      return res.status(400).json({ error: "Debes subir una imagen de perfil." });
+    }
+
+    const imageFile = req.files.image;
+    // Subir la imagen a Cloudinary en la carpeta "profile_images"
+    const result = await cloudinary.v2.uploader.upload(imageFile.tempFilePath, {
+      folder: "profile_images",
+      transformation: { width: 300, height: 300, crop: "fill" } // Opcional: redimensiona la imagen
+    });
+    const imageUrl = result.secure_url;
+
+    // Actualizar la imagen de perfil en la base de datos
+    const query = "UPDATE user SET profile_image = ? WHERE id = ?";
+    executeQuery(query, [imageUrl, userId], (err: any, results: any) => {
+      if (err) {
+        console.error("Error al actualizar la imagen de perfil:", err);
+        return res.status(500).json({ error: "Error interno del servidor" });
+      }
+      if (results.affectedRows === 0) {
+        return res.status(404).json({ error: "Usuario no encontrado" });
+      }
+      res.status(200).json({ message: "Imagen de perfil actualizada exitosamente", imageUrl });
+    });
+
+  } catch (error) {
+    console.error("Error en updateProfileImage:", error);
+    return res.status(500).json({ error: "Error interno del servidor" });
+  }
+};
+
+*/
