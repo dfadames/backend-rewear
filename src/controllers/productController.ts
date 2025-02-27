@@ -23,7 +23,10 @@ export const getProductInfo = (req: any, res: any, next: any) => {
     product.price, 
     product.description, 
     product.category, 
-    product.status 
+    product.status,
+    product.publication_status,
+    product.publication_date,
+    product.image_path
   FROM product 
   INNER JOIN user 
     ON user.id = product.seller_id 
@@ -105,60 +108,84 @@ export const createProduct = async (req: any, res: any) => {
 };
 
 
+//actualizar producto
+export const updateProduct = async (req: any, res: any) => {
+  try {
+    const productId = req.params.id;
+    const seller_id = req.user.id;
+    const { name_product, price, category, description, status, publication_status } = req.body;
+    const pubStatus = publication_status || 'available';
 
-// Update producto
-export const updateProduct = (req: any, res: any) => {
-  const productId = req.params.id;
-  const seller_id = req.user.id; // ID del usuario autenticado
-
-  const { name_product, price, category, description, status, publication_status } = req.body;
-
-  if (!name_product || !price || !category || !description || status === undefined) {
-    return res.status(400).json({ 
-      error: "Todos los campos son obligatorios: name_product, price, category, description y status" 
-    });
-  }
-
-  const pubStatus = publication_status || 'available';
-  // verificamos prducto
-  const checkQuery = "SELECT seller_id FROM product WHERE id = ?";
-  
-  executeQuery(checkQuery, [productId], (err: any, results: any) => {
-    if (err) {
-      console.error("Error al verificar el producto:", err);
-      return res.status(500).json({ error: "Error interno del servidor" });
+    if (!name_product || !price || !category || !description || status === undefined) {
+      return res.status(400).json({ 
+        error: "Todos los campos son obligatorios: name_product, price, category, description y status" 
+      });
     }
 
-    if (results.length === 0) {
-      return res.status(404).json({ error: "Producto no encontrado" });
-    }
-
-    if (results[0].seller_id !== seller_id) {
-      return res.status(403).json({ error: "No tienes permiso para modificar este producto" });
-    }
-
-    // **Si el producto pertenece al usuario, procedemos con la actualización**
-    const updateQuery = `
-      UPDATE product 
-      SET name_product = ?, category = ?, price = ?, description = ?, status = ?, publication_status = ?
-      WHERE id = ? AND seller_id = ?
-    `;
-
-    executeQuery(updateQuery, [name_product, category, price, description, status, pubStatus, productId, seller_id], (err: any, results: any) => {
+    // Verificar que el producto existe y pertenece al usuario
+    const checkQuery = "SELECT seller_id FROM product WHERE id = ?";
+    executeQuery(checkQuery, [productId], async (err: any, results: any) => {
       if (err) {
-        console.error("Error al actualizar el producto:", err);
+        console.error("Error al verificar el producto:", err);
         return res.status(500).json({ error: "Error interno del servidor" });
       }
-
-      if (results.affectedRows === 0) {
-        return res.status(404).json({ error: "Producto no encontrado o no pertenece al usuario" });
+      if (results.length === 0) {
+        return res.status(404).json({ error: "Producto no encontrado" });
+      }
+      if (results[0].seller_id !== seller_id) {
+        return res.status(403).json({ error: "No tienes permiso para modificar este producto" });
       }
 
-      res.status(200).json({ message: "Producto actualizado exitosamente" });
-    });
-  });
-};
+      // Si se envía una nueva imagen, súbela a Cloudinary
+      let imageUrl = null;
+      if (req.files && req.files.image) {
+        const imageFile = req.files.image;
+        try {
+          const result = await cloudinary.v2.uploader.upload(imageFile.tempFilePath, {
+            folder: "rewear_products",
+          });
+          imageUrl = result.secure_url;
+        } catch (uploadErr) {
+          console.error("Error al subir la nueva imagen:", uploadErr);
+          return res.status(500).json({ error: "Error al subir la imagen" });
+        }
+      }
 
+      // Construir la consulta de actualización
+      let updateQuery = "";
+      let params = [];
+      if (imageUrl) {
+        updateQuery = `
+          UPDATE product
+          SET name_product = ?, category = ?, price = ?, description = ?, status = ?, publication_status = ?, image_path = ?
+          WHERE id = ? AND seller_id = ?
+        `;
+        params = [name_product, category, price, description, status, pubStatus, imageUrl, productId, seller_id];
+      } else {
+        updateQuery = `
+          UPDATE product
+          SET name_product = ?, category = ?, price = ?, description = ?, status = ?, publication_status = ?
+          WHERE id = ? AND seller_id = ?
+        `;
+        params = [name_product, category, price, description, status, pubStatus, productId, seller_id];
+      }
+
+      executeQuery(updateQuery, params, (err: any, results: any) => {
+        if (err) {
+          console.error("Error al actualizar el producto:", err);
+          return res.status(500).json({ error: "Error interno del servidor" });
+        }
+        if (results.affectedRows === 0) {
+          return res.status(404).json({ error: "Producto no encontrado o no pertenece al usuario" });
+        }
+        return res.status(200).json({ message: "Producto actualizado exitosamente" });
+      });
+    });
+  } catch (error) {
+    console.error("Error en updateProduct:", error);
+    return res.status(500).json({ error: "Error interno del servidor" });
+  }
+};
 
 // Delete producto
 export const deleteProduct = (req: any, res: any) => {
