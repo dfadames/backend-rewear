@@ -32,16 +32,15 @@ app.use(cors(corsOptions));
 const PORT = process.env.PORT;
 
 //importamos el direccionamiento de rutas:
-
-
-import { login, register, resetPassword, updatePassword , googleAuth } from "./controllers/authController";
+import { login, register, resetPassword, updatePassword, googleAuth } from "./controllers/authController";
 import { ping, getUsuarios } from "./controllers/othersController";
 import { authenticateToken } from "./token/authtoken";
-import { getProfileInfo, getUserProfileByUsername , getUserProfileById, getuseridByUsername} from "./controllers/profileController";
-import { createProduct,updateProduct,deleteProduct,getAllProducts,getProductInfo, getProductsBySeller } from "./controllers/productController";
+import { getProfileInfo, getUserProfileByUsername, getUserProfileById, getuseridByUsername } from "./controllers/profileController";
+import { createProduct, updateProduct, deleteProduct, getAllProducts, getProductInfo, getProductsBySeller } from "./controllers/productController";
 import { addToCart, removeFromCart, getCart } from "./controllers/cartController";
-import {getProductsByName} from "./controllers/searchProducts";
-import {getProductsByFilters} from "./controllers/productSearchFilter";
+import { getProductsByName } from "./controllers/searchProducts";
+import { getProductsByFilters } from "./controllers/productSearchFilter";
+import { createReview, getReviewsByProduct } from "./controllers/reviewController";
 // con base al token obtenemos la info necesaria
 const getProfileData = [authenticateToken, getProfileInfo];
 const createProductData = [authenticateToken, createProduct];
@@ -51,7 +50,6 @@ const getProductData = [getProductInfo];
 app.post("/login", login);
 app.post("/register", register);
 app.post("/auth/google", googleAuth); // A
-
 //-------------------------------------------------------------------------
 // RECUPERACIÓN DE CONTRASEÑA
 // Ruta para solicitar el envío del correo de recuperación (envía el token al email del usuario)
@@ -115,8 +113,13 @@ app.delete("/cart/remove", authenticateToken, removeFromCart);
 app.get("/cart", authenticateToken, getCart);
 
 //-------------------------------------------------------------------------
+// Review
+app.post("/reviews", authenticateToken, createReview); //
+app.post("/reviews/:productId", authenticateToken, createReview);
+
+
+//-------------------------------------------------------------------------
 //rutas de funcionalidades varias:
 app.get("/ping", ping);
 app.get("/usuarios", getUsuarios);
 // Middleware para obtener la información del producto
-
