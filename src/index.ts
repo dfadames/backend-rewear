@@ -116,6 +116,8 @@ app.get("/cart", authenticateToken, getCart);
 // Review
 app.post("/reviews", authenticateToken, createReview); //
 app.post("/reviews/:productId", authenticateToken, createReview);
+// Obtener reseñas de un producto
+app.get("/reviews/:productId", getReviewsByProduct);
 
 
 //-------------------------------------------------------------------------

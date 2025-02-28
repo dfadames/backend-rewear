@@ -37,24 +37,25 @@ export const createReview = (req: any, res: any) => {
   };  
 
 // Obtener reseñas de un producto
-export const getReviewsByProduct = (req:any, res:any) => {
+export const getReviewsByProduct = (req: any, res: any) => {
     const productId = req.params.productId;
-
-    // Construimos la consulta SQL para obtener las reseñas de un producto
+  
+    if (!productId) {
+      return res.status(400).json({ error: "El productId es obligatorio" });
+    }
+  
     const query = `
-        SELECT * FROM reviews
-        WHERE product_id = ?
+      SELECT * FROM reviews
+      WHERE product_id = ?
     `;
-
-    // Ejecutamos la consulta para obtener las reseñas del producto
-    executeQuery(query, [productId], (err:any, results:any) => {
-        if (err) {
-            console.error("Error al obtener las reseñas:", err);
-            return res.status(500).json({ error: "Error interno del servidor" });
-        }
-
-        res.status(200).json(results);
+  
+    executeQuery(query, [productId], (err: any, results: any) => {
+      if (err) {
+        console.error("Error al obtener las reseñas:", err);
+        return res.status(500).json({ error: "Error interno del servidor" });
+      }
+      res.status(200).json(results);
     });
-}
-
+  };
+  
 // 
