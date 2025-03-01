@@ -3,15 +3,18 @@ USE rewear;
 
 /* Tabla de usuarios */
 CREATE TABLE user (
-  id INT NOT NULL AUTO_INCREMENT,
-  email VARCHAR(100) UNIQUE NOT NULL,
-  username VARCHAR(50) UNIQUE NOT NULL,
-  password CHAR(255) NOT NULL,
-  registration_date DATE NOT NULL,
-  PRIMARY KEY (id)
+  id int PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  first_name varchar(50) NOT NULL,
+  last_names varchar(50) NOT NULL,
+  phone varchar(15) NOT NULL,
+  username varchar(15) NOT NULL,
+  registration_date date NOT NULL,
+  email varchar(100) UNIQUE NOT NULL,
+  password char(255) NOT NULL,
+  image_perfil VARCHAR(500),
+  reset_token varchar(255) DEFAULT NULL,
+  reset_token_expiry datetime DEFAULT NULL
 );
-
-/* Tabla de productos */
 CREATE TABLE product (
   id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   seller_id INT NOT NULL,
@@ -20,8 +23,10 @@ CREATE TABLE product (
   price DECIMAL(10,2) NOT NULL,
   description VARCHAR(400),
   status INT NOT NULL,
+  is_rated BOOL,
   publication_status ENUM('available','out_of_stock') NOT NULL DEFAULT 'available',
   publication_date DATE NOT NULL,
+  image_path VARCHAR(500),
   CONSTRAINT fk_product_user
     FOREIGN KEY (seller_id)
     REFERENCES user(id)
@@ -29,27 +34,31 @@ CREATE TABLE product (
     ON UPDATE CASCADE
 );
 
-/* Tabla de reseñas */
+-- Tabla de reseñas
 CREATE TABLE reviews (
   id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  product_id INT NOT NULL,
+  seller_id INT NOT NULL,
   user_id INT NOT NULL,
+  product_id INT NOT NULL,
   comment VARCHAR(400),
   rating INT NOT NULL,
   comment_date DATE NOT NULL,
-  CONSTRAINT fk_reviews_product
-    FOREIGN KEY (product_id)
-    REFERENCES product(id)
+  CONSTRAINT fk_reviews_seller
+    FOREIGN KEY (seller_id)
+    REFERENCES user(id)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
   CONSTRAINT fk_reviews_user
     FOREIGN KEY (user_id)
     REFERENCES user(id)
     ON DELETE CASCADE
-    ON UPDATE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT fk_reviews_product
+    FOREIGN KEY (product_id)
+    REFERENCES product(id)    
 );
 
-/* Tabla de transacciones */
+-- Tabla de transacciones
 CREATE TABLE transaction (
   id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   product_id INT NOT NULL,
@@ -70,7 +79,7 @@ CREATE TABLE transaction (
     ON UPDATE CASCADE
 );
 
-/* Tabla de métodos de pago */
+-- Tabla de métodos de pago
 CREATE TABLE payment_method (
   id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   user_id INT NOT NULL,
@@ -83,7 +92,7 @@ CREATE TABLE payment_method (
     ON UPDATE CASCADE
 );
 
-/* Tabla de imágenes de productos */
+-- Tabla de imágenes de productos
 CREATE TABLE product_image (
   id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   image_id VARCHAR(255) NOT NULL,
@@ -94,4 +103,21 @@ CREATE TABLE product_image (
     REFERENCES product(id)
     ON DELETE CASCADE
     ON UPDATE CASCADE
+);
+
+-- Tabla de carrito de compras
+CREATE TABLE cart (
+  user_id INT NOT NULL,
+  product_id INT NOT NULL,
+  quantity INT NOT NULL DEFAULT 1,
+  added_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (user_id, product_id),
+  CONSTRAINT fk_cart_user
+    FOREIGN KEY (user_id)
+    REFERENCES user(id)
+    ON DELETE CASCADE,
+  CONSTRAINT fk_cart_product
+    FOREIGN KEY (product_id)
+    REFERENCES product(id)
+    ON DELETE CASCADE
 );
