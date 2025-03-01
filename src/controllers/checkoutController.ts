@@ -34,9 +34,9 @@ export const createPaymentPreference = async (req: any, res: any) => {
       body: {
         items,
         back_urls: {
-          success: process.env.MP_BACK_URL_SUCCESS || "https://tu-dominio.com/success",
-          failure: process.env.MP_BACK_URL_FAILURE || "https://tu-dominio.com/failure",
-          pending: process.env.MP_BACK_URL_PENDING || "https://tu-dominio.com/pending",
+          success: process.env.MP_BACK_URL_SUCCESS || "https://frontend-re-wear.vercel.app/paymentsuccess",
+          failure: process.env.MP_BACK_URL_FAILURE || "https://frontend-re-wear.vercel.app/paymenterror",
+          pending: process.env.MP_BACK_URL_PENDING || "https://frontend-re-wear.vercel.app/paymentpending",
         },
         auto_return: "approved"
       }
