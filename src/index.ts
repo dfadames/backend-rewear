@@ -87,7 +87,7 @@ app.post("/idexterno", getuseridByUsername);
 //perfilexterno general
 app.get("/user/:username", getUserProfileByUsername);
 // Eliminar perfil
-app.delete("/profile", authenticateToken, deleteProfile);
+app.delete("/eliminarperfil", authenticateToken, deleteProfile);
 
 
 //-------------------------------------------------------------------------
