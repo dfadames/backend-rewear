@@ -61,36 +61,41 @@ export const login = (req: Request, res: Response) => {
 //REGISTER
 //se realiza una peticion para insertar datos en la base de datos
 export const register = async (req: Request, res: Response) => {
-  const {first_name, last_names, phone, username,email,password} = req.body;
+  const { first_name, last_names, phone, username, email, password } = req.body;
 
   try {
-    // Genera una sal y hashea la contraseña
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
-    const registration_date = new Date();
-    const query =
-      "INSERT INTO user (first_name, last_names, phone, username, email, password, registration_date) VALUES (?, ?, ?, ?, ?, ?, ?)";
-
-    executeQuery(query, [first_name, last_names, phone,username,email, hashedPassword,registration_date], (err: Error) => {
+    // Consulta previa para verificar si el usuario o email ya existen
+    const checkQuery = "SELECT * FROM user WHERE username = ? OR email = ?";
+    executeQuery(checkQuery, [username, email], async (err: Error, results: any) => {
       if (err) {
-        const errorMessage = "" + err;
-        if (errorMessage.includes("Duplicate")) {
-          res
-            .status(400)
-            .json({ error: "Este usuario y/o email ya está registrado" });
-        } else {
-          console.error("Error en la consulta SQL: " + err);
-          res.status(500).json({ error: "Error interno del servidor" });
-        }
-      } else {
-        console.log("Usuario creado: " + username);
-        const user = { username: username};
-        const token = jwt.sign(user, secretKey);
-        res.status(200).json({ token });
+        console.error("Error al verificar usuario existente: " + err);
+        return res.status(500).json({ error: "Error interno del servidor" });
       }
+      
+      if (results && results.length > 0) {
+        // Si se encuentra un usuario con ese username o email, se retorna un error
+        return res.status(400).json({ error: "Este usuario y/o email ya está registrado" });
+      }
+
+      // Si no existe, se procede a hashear la contraseña y registrar el usuario
+      const saltRounds = 10;
+      const hashedPassword = await bcrypt.hash(password, saltRounds);
+      const registration_date = new Date();
+      const query = "INSERT INTO user (first_name, last_names, phone, username, email, password, registration_date) VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+      executeQuery(query, [first_name, last_names, phone, username, email, hashedPassword, registration_date], (err: Error) => {
+        if (err) {
+          console.error("Error en la consulta SQL: " + err);
+          return res.status(500).json({ error: "Error interno del servidor" });
+        }
+        console.log("Usuario creado: " + username);
+        const user = { username: username };
+        const token = jwt.sign(user, secretKey);
+        return res.status(200).json({ token });
+      });
     });
   } catch (error) {
-    console.error("Error al hashear la contraseña: ", error);
+    console.error("Error al procesar el registro: ", error);
     res.status(500).json({ error: "Error interno del servidor" });
   }
 };
