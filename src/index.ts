@@ -38,9 +38,12 @@ import { authenticateToken } from "./token/authtoken";
 import { getProfileInfo, getUserProfileByUsername, getUserProfileById, getuseridByUsername } from "./controllers/profileController";
 import { createProduct, updateProduct, deleteProduct, getAllProducts, getProductInfo, getProductsBySeller } from "./controllers/productController";
 import { addToCart, removeFromCart, getCart } from "./controllers/cartController";
-import { getProductsByName } from "./controllers/searchProducts";
-import { getProductsByFilters } from "./controllers/productSearchFilter";
+
+import {getProductsByName} from "./controllers/searchProducts";
+import {getProductsByFilters} from "./controllers/productSearchFilter";
+import { createPaymentPreference, mpWebhook, paymentSuccess, paymentFailure, paymentPending } from "./controllers/checkoutController";
 import { createReview, getReviewsByProduct } from "./controllers/reviewController";
+
 // con base al token obtenemos la info necesaria
 const getProfileData = [authenticateToken, getProfileInfo];
 const createProductData = [authenticateToken, createProduct];
@@ -111,13 +114,25 @@ app.post("/cart/remove", authenticateToken, removeFromCart);
 
 // Consultar el carrito del usuario
 app.get("/cart", authenticateToken, getCart);
-
 //-------------------------------------------------------------------------
 // Review
 app.post("/reviews", authenticateToken, createReview); //
 app.post("/reviews/:productId", authenticateToken, createReview);
 // Obtener reseñas de un producto
 app.get("/reviews/:productId", getReviewsByProduct);
+
+//-------------------------------------------------------------------------
+// RUTAS DE MERCADO PAGO
+// Crear preferencia de pago
+app.post("/payment/create_preference", createPaymentPreference);
+// Webhook para notificaciones de Mercado Pago
+app.post("/payment/webhook", mpWebhook);
+// Redirecciones según el resultado del pago
+app.get("/payment/success", paymentSuccess);
+app.get("/payment/failure", paymentFailure);
+app.get("/payment/pending", paymentPending);
+
+
 
 
 //-------------------------------------------------------------------------
