@@ -35,7 +35,7 @@ const PORT = process.env.PORT;
 import { login, register, resetPassword, updatePassword, googleAuth } from "./controllers/authController";
 import { ping, getUsuarios } from "./controllers/othersController";
 import { authenticateToken } from "./token/authtoken";
-import { getProfileInfo, getUserProfileByUsername, getUserProfileById, getuseridByUsername } from "./controllers/profileController";
+import { getProfileInfo, getUserProfileByUsername, getUserProfileById, getuseridByUsername, deleteProfile  } from "./controllers/profileController";
 import { createProduct, updateProduct, deleteProduct, getAllProducts, getProductInfo, getProductsBySeller } from "./controllers/productController";
 import { addToCart, removeFromCart, getCart } from "./controllers/cartController";
 
@@ -86,6 +86,8 @@ app.post("/perfilexterno", getUserProfileById);
 app.post("/idexterno", getuseridByUsername);
 //perfilexterno general
 app.get("/user/:username", getUserProfileByUsername);
+// Eliminar perfil
+app.delete("/profile", authenticateToken, deleteProfile);
 
 
 //-------------------------------------------------------------------------
