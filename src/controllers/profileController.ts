@@ -102,8 +102,36 @@ export const getUserProfileByUsername = (req: any, res: any) => {
     if (results.length === 0) {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
+    // Obtenemos el perfil del usuario
+    const userProfile = results[0];
 
-    // Devolvemos la información del usuario
-    res.status(200).json(results[0]);
+    // Ahora, consultamos el promedio de reseñas para este vendedor
+    const avgQuery = "SELECT AVG(rating) AS averageRating FROM reviews WHERE seller_id = ?";
+    executeQuery(avgQuery, [userProfile.id], (err: any, avgResults: any) => {
+      if (err) {
+        console.error("Error al obtener promedio de reseñas:", err);
+        return res.status(500).json({ error: "Error interno del servidor" });
+      }
+
+      const averageRating = avgResults[0].averageRating || 0;
+
+      // Consultamos la lista de reseñas (IDs de usuarios y comentarios) para este vendedor
+      const listQuery = "SELECT user_id, comment FROM reviews WHERE seller_id = ?";
+      executeQuery(listQuery, [userProfile.id], (err: any, reviewList: any) => {
+        if (err) {
+          console.error("Error al obtener reseñas:", err);
+          return res.status(500).json({ error: "Error interno del servidor" });
+        }
+
+        // Combinamos la información del perfil con las estadísticas de reseñas
+        return res.status(200).json({
+          ...userProfile,
+          reviewStats: {
+            averageRating,
+            reviews: reviewList
+          }
+        });
+      });
+    });
   });
 };

@@ -84,7 +84,6 @@ app.post("/idexterno", getuseridByUsername);
 //perfilexterno general
 app.get("/user/:username", getUserProfileByUsername);
 
-
 //-------------------------------------------------------------------------
 //BUSQUEDA DE PRODUCTOS
 app.get("/search/:name", getProductsByName, (req: any, res: any) => {
@@ -114,11 +113,9 @@ app.get("/cart", authenticateToken, getCart);
 
 //-------------------------------------------------------------------------
 // Review
-app.post("/reviews", authenticateToken, createReview); //
-app.post("/reviews/:productId", authenticateToken, createReview);
-// Obtener reseñas de un producto
-app.get("/reviews/:productId", getReviewsByProduct);
-
+app.post("/reviews/:sellerId", authenticateToken, createReview);
+app.post("/sellerId/:productId", authenticateToken, createReview);
+app.get("/rating/:user", getReviewsByProduct); //------------------------------------------------hacer------------------------------------------------
 
 //-------------------------------------------------------------------------
 //rutas de funcionalidades varias:
