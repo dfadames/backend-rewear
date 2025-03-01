@@ -1,5 +1,9 @@
 //importamos express
 import express from "express";
+//importamos cloudinary
+import cloudinary from "cloudinary";
+//importamos la libreria para subir archivos para imagenes
+import fileUpload from "express-fileupload";
 //creamos la app
 const app = express();
 
@@ -25,7 +29,18 @@ const corsOptions = {
   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos permitidos
   allowedHeaders: ['Content-Type', 'Authorization'], // Cabeceras permitidas
 };
+//configuracion de fileupload
+app.use(fileUpload({
+  useTempFiles: true, // Necesario para trabajar con Cloudinary
+  tempFileDir: "/tmp/",
+}));
 
+//configuracion de cloudinary
+cloudinary.v2.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,  
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 // Middleware de CORS
 app.use(cors(corsOptions));
 //puerto

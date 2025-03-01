@@ -1,3 +1,4 @@
+import cloudinary from "cloudinary";
 // Importamos la función para ejecutar consultas en la base de datos
 import { executeQuery } from "../db/models/queryModel";
 
@@ -22,7 +23,10 @@ export const getProductInfo = (req: any, res: any, next: any) => {
     product.price, 
     product.description, 
     product.category, 
-    product.status 
+    product.status,
+    product.publication_status,
+    product.publication_date,
+    product.image_path
   FROM product 
   INNER JOIN user 
     ON user.id = product.seller_id 
@@ -46,95 +50,142 @@ export const getProductInfo = (req: any, res: any, next: any) => {
 };
 
 // crear producto
-export const createProduct = (req: any, res: any) => {
+export const createProduct = async (req: any, res: any) => {
+  try {
+    // Extraer datos del cuerpo de la petición
+    const { name_product, category, price, description, status, publication_status } = req.body;
+    const seller_id = req.user.id; // Se asume que el usuario autenticado está en req.user
+    const publication_date = new Date().toISOString().slice(0, 10);
+    const pubStatus = publication_status || 'available';
 
-  // Extraemos los datos del cuerpo de la petición
-  const { name_product, category, price, description, status, publication_status } = req.body;
-  // Obtenemos el ID del vendedor desde el usuario autenticado
-  const seller_id = req.user.id;
-  // Formateamos la fecha actual en formato YYYY-MM-DD
-  const publication_date = new Date().toISOString().slice(0, 10);
-  // Asignamos un valor por defecto a publication_status si no se proporciona
-  const pubStatus = publication_status || 'available';
-
-  // Validamos que todos los campos requeridos estén presentes
-  if (!name_product || !price || !category || !description || (status === undefined)) {
-    return res.status(400).json({ error: "Todos los campos son obligatorios: name_product, price, category, description y status" });
-  }
-
-  // Preparamos la consulta SQL para insertar el nuevo producto, asociándolo al usuario
-  const query = "INSERT INTO product (seller_id, name_product, category, price, description, status, publication_status, publication_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-
-  // Ejecutamos la consulta pasando los parámetros
-  executeQuery(query, [seller_id, name_product, category, price, description, status, pubStatus, publication_date], (err: any , results: any) => {
-    if (err) {
-      console.error("Error al crear el producto:", err);
-      return res.status(500).json({ error: "Error interno del servidor" });
+    // Validar que los campos obligatorios estén presentes
+    if (!name_product || !price || !category || !description || status === undefined) {
+      return res.status(400).json({ error: "Todos los campos son obligatorios: name_product, price, category, description y status" });
     }
 
-    // Si la inserción es exitosa, devolvemos un estado 201 (creado) junto con el ID del nuevo producto
-    res.status(201).json({
-      message: "Producto creado exitosamente",
-      productId: results.insertId, // Asegúrate de que results.insertId esté definido en tu implementación de executeQuery
+    // Validar que se envíe una imagen
+    if (!req.files || !req.files.image) {
+      return res.status(400).json({ error: "Debes subir una imagen del producto." });
+    }
+
+    // Obtener el archivo de imagen
+    const imageFile = req.files.image;
+
+    // Subir la imagen a Cloudinary
+    const result = await cloudinary.v2.uploader.upload(imageFile.tempFilePath, {
+      folder: "rewear_products", // Carpeta donde se guardarán las imágenes en Cloudinary
     });
-  });
-};
+    const imageUrl = result.secure_url; // URL de la imagen en Cloudinary
 
-
-
-// Update producto
-export const updateProduct = (req: any, res: any) => {
-  const productId = req.params.id;
-  const seller_id = req.user.id; // ID del usuario autenticado
-
-  const { name_product, price, category, description, status, publication_status } = req.body;
-
-  if (!name_product || !price || !category || !description || status === undefined) {
-    return res.status(400).json({ 
-      error: "Todos los campos son obligatorios: name_product, price, category, description y status" 
-    });
-  }
-
-  const pubStatus = publication_status || 'available';
-  // verificamos prducto
-  const checkQuery = "SELECT seller_id FROM product WHERE id = ?";
-  
-  executeQuery(checkQuery, [productId], (err: any, results: any) => {
-    if (err) {
-      console.error("Error al verificar el producto:", err);
-      return res.status(500).json({ error: "Error interno del servidor" });
-    }
-
-    if (results.length === 0) {
-      return res.status(404).json({ error: "Producto no encontrado" });
-    }
-
-    if (results[0].seller_id !== seller_id) {
-      return res.status(403).json({ error: "No tienes permiso para modificar este producto" });
-    }
-
-    // **Si el producto pertenece al usuario, procedemos con la actualización**
-    const updateQuery = `
-      UPDATE product 
-      SET name_product = ?, category = ?, price = ?, description = ?, status = ?, publication_status = ?
-      WHERE id = ? AND seller_id = ?
+    // Preparamos la consulta SQL para insertar el nuevo producto, incluyendo la URL de la imagen
+    const query = `
+      INSERT INTO product 
+      (seller_id, name_product, category, price, description, status, publication_status, publication_date, image_path) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
-    executeQuery(updateQuery, [name_product, category, price, description, status, pubStatus, productId, seller_id], (err: any, results: any) => {
-      if (err) {
-        console.error("Error al actualizar el producto:", err);
-        return res.status(500).json({ error: "Error interno del servidor" });
+    // Ejecutar la consulta en la base de datos
+    executeQuery(
+      query,
+      [seller_id, name_product, category, price, description, status, pubStatus, publication_date, imageUrl],
+      (err: any, results: any) => {
+        if (err) {
+          console.error("Error al crear el producto:", err);
+          return res.status(500).json({ error: "Error interno del servidor" });
+        }
+        res.status(201).json({
+          message: "Producto creado exitosamente",
+          productId: results.insertId,
+          imageUrl: imageUrl,
+        });
       }
+    );
 
-      if (results.affectedRows === 0) {
-        return res.status(404).json({ error: "Producto no encontrado o no pertenece al usuario" });
-      }
-
-      res.status(200).json({ message: "Producto actualizado exitosamente" });
-    });
-  });
+  } catch (error) {
+    console.error("Error en createProduct:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
 };
 
+
+//actualizar producto
+export const updateProduct = async (req: any, res: any) => {
+  try {
+    const productId = req.params.id;
+    const seller_id = req.user.id;
+    const { name_product, price, category, description, status, publication_status } = req.body;
+    const pubStatus = publication_status || 'available';
+
+    if (!name_product || !price || !category || !description || status === undefined) {
+      return res.status(400).json({ 
+        error: "Todos los campos son obligatorios: name_product, price, category, description y status" 
+      });
+    }
+
+    // Verificar que el producto existe y pertenece al usuario
+    const checkQuery = "SELECT seller_id FROM product WHERE id = ?";
+    executeQuery(checkQuery, [productId], async (err: any, results: any) => {
+      if (err) {
+        console.error("Error al verificar el producto:", err);
+        return res.status(500).json({ error: "Error interno del servidor" });
+      }
+      if (results.length === 0) {
+        return res.status(404).json({ error: "Producto no encontrado" });
+      }
+      if (results[0].seller_id !== seller_id) {
+        return res.status(403).json({ error: "No tienes permiso para modificar este producto" });
+      }
+
+      // Si se envía una nueva imagen, súbela a Cloudinary
+      let imageUrl = null;
+      if (req.files && req.files.image) {
+        const imageFile = req.files.image;
+        try {
+          const result = await cloudinary.v2.uploader.upload(imageFile.tempFilePath, {
+            folder: "rewear_products",
+          });
+          imageUrl = result.secure_url;
+        } catch (uploadErr) {
+          console.error("Error al subir la nueva imagen:", uploadErr);
+          return res.status(500).json({ error: "Error al subir la imagen" });
+        }
+      }
+
+      // Construir la consulta de actualización
+      let updateQuery = "";
+      let params = [];
+      if (imageUrl) {
+        updateQuery = `
+          UPDATE product
+          SET name_product = ?, category = ?, price = ?, description = ?, status = ?, publication_status = ?, image_path = ?
+          WHERE id = ? AND seller_id = ?
+        `;
+        params = [name_product, category, price, description, status, pubStatus, imageUrl, productId, seller_id];
+      } else {
+        updateQuery = `
+          UPDATE product
+          SET name_product = ?, category = ?, price = ?, description = ?, status = ?, publication_status = ?
+          WHERE id = ? AND seller_id = ?
+        `;
+        params = [name_product, category, price, description, status, pubStatus, productId, seller_id];
+      }
+
+      executeQuery(updateQuery, params, (err: any, results: any) => {
+        if (err) {
+          console.error("Error al actualizar el producto:", err);
+          return res.status(500).json({ error: "Error interno del servidor" });
+        }
+        if (results.affectedRows === 0) {
+          return res.status(404).json({ error: "Producto no encontrado o no pertenece al usuario" });
+        }
+        return res.status(200).json({ message: "Producto actualizado exitosamente" });
+      });
+    });
+  } catch (error) {
+    console.error("Error en updateProduct:", error);
+    return res.status(500).json({ error: "Error interno del servidor" });
+  }
+};
 
 // Delete producto
 export const deleteProduct = (req: any, res: any) => {
