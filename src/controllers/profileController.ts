@@ -107,3 +107,31 @@ export const getUserProfileByUsername = (req: any, res: any) => {
     res.status(200).json(results[0]);
   });
 };
+
+// Eliminar perfil.
+export const deleteProfile = (req: any, res: any) => {
+  // Retrieve the authenticated user's id from the request
+  const userId = req.user.id;
+
+  if (!userId) {
+    return res.status(400).json({ error: "No se encontró el ID del usuario" });
+  }
+
+  // SQL query to delete the user from the 'user' table
+  const query = "DELETE FROM user WHERE id = ?";
+
+  executeQuery(query, [userId], (err: any, results: any) => {
+    if (err) {
+      console.error("Error al eliminar el perfil:", err);
+      return res.status(500).json({ error: "Error interno del servidor" });
+    }
+
+    // Check if a record was deleted (affectedRows should be > 0)
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ message: "Perfil no encontrado" });
+    }
+
+    // If the deletion was successful, send a success response
+    res.status(200).json({ message: "Perfil eliminado exitosamente" });
+  });
+};
