@@ -107,7 +107,7 @@ app.listen(PORT, () => {
 app.post("/cart/add", authenticateToken, addToCart);
 
 // Eliminar un producto del carrito
-app.delete("/cart/remove", authenticateToken, removeFromCart);
+app.post("/cart/remove", authenticateToken, removeFromCart);
 
 // Consultar el carrito del usuario
 app.get("/cart", authenticateToken, getCart);
