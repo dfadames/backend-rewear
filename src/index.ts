@@ -87,7 +87,6 @@ app.post("/idexterno", getuseridByUsername);
 //perfilexterno general
 app.get("/user/:username", getUserProfileByUsername);
 
-
 //-------------------------------------------------------------------------
 //BUSQUEDA DE PRODUCTOS
 app.get("/search/:name", getProductsByName, (req: any, res: any) => {
@@ -116,10 +115,9 @@ app.post("/cart/remove", authenticateToken, removeFromCart);
 app.get("/cart", authenticateToken, getCart);
 //-------------------------------------------------------------------------
 // Review
-app.post("/reviews", authenticateToken, createReview); //
-app.post("/reviews/:productId", authenticateToken, createReview);
-// Obtener reseñas de un producto
-app.get("/reviews/:productId", getReviewsByProduct);
+app.post("/reviews/:sellerId", authenticateToken, createReview);
+app.post("/sellerId/:productId", authenticateToken, createReview);
+app.get("/rating/:user", getReviewsByProduct); //------------------------------------------------hacer------------------------------------------------
 
 //-------------------------------------------------------------------------
 // RUTAS DE MERCADO PAGO
@@ -131,10 +129,6 @@ app.post("/payment/webhook", mpWebhook);
 app.get("/payment/success", paymentSuccess);
 app.get("/payment/failure", paymentFailure);
 app.get("/payment/pending", paymentPending);
-
-
-
-
 //-------------------------------------------------------------------------
 //rutas de funcionalidades varias:
 app.get("/ping", ping);
