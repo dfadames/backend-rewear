@@ -48,12 +48,14 @@ const PORT = process.env.PORT;
 
 //importamos el direccionamiento de rutas:
 import { login, register, resetPassword, updatePassword, googleAuth , updatePasswordnormal} from "./controllers/authController";
+import { updateProfileImage } from "./controllers/profileController";
+
 import { ping, getUsuarios } from "./controllers/othersController";
 import { authenticateToken } from "./token/authtoken";
 import { getProfileInfo, getUserProfileByUsername, getUserProfileById, getuseridByUsername, deleteProfile  } from "./controllers/profileController";
 import { createProduct, updateProduct, deleteProduct, getAllProducts, getProductInfo, getProductsBySeller } from "./controllers/productController";
 import { addToCart, removeFromCart, getCart } from "./controllers/cartController";
-
+import { getProfileImage } from "./controllers/profileController";
 import {getProductsByName} from "./controllers/searchProducts";
 import {getProductsByFilters} from "./controllers/productSearchFilter";
 import {createPaymentPreference, mpWebhook, paymentSuccess, paymentFailure, paymentPending, getPurchaseHistory   } from "./controllers/checkoutController";
@@ -103,10 +105,14 @@ app.post("/idexterno", getuseridByUsername);
 app.get("/user/:username", getUserProfileByUsername);
 // Eliminar perfil
 app.delete("/eliminarperfil", authenticateToken, deleteProfile);
+
+app.put("/profile/image", authenticateToken, updateProfileImage);
+app.get("/profile/image", authenticateToken, getProfileImage);
 // Update password desde el perfil
 app.put('/update-password-normal', async (req, res) => {
   await updatePasswordnormal(req, res);
 });
+
 //-------------------------------------------------------------------------
 //BUSQUEDA DE PRODUCTOS
 app.get("/search/:name", getProductsByName, (req: any, res: any) => {
