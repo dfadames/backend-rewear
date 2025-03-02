@@ -56,7 +56,7 @@ import { addToCart, removeFromCart, getCart } from "./controllers/cartController
 
 import {getProductsByName} from "./controllers/searchProducts";
 import {getProductsByFilters} from "./controllers/productSearchFilter";
-import {createPaymentPreference, mpWebhook, paymentSuccess, paymentFailure, paymentPending } from "./controllers/checkoutController";
+import {createPaymentPreference, mpWebhook, paymentSuccess, paymentFailure, paymentPending, getPurchaseHistory   } from "./controllers/checkoutController";
 import {createReview, getReviewsByUsername} from "./controllers/reviewController";
 
 // con base al token obtenemos la info necesaria
@@ -149,6 +149,8 @@ app.post("/payment/webhook", mpWebhook);
 app.get("/payment/success", paymentSuccess);
 app.get("/payment/failure", paymentFailure);
 app.get("/payment/pending", paymentPending);
+//paiment 
+app.get("/payment/history", authenticateToken, getPurchaseHistory);
 
 
 
