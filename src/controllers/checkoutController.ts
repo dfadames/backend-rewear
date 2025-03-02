@@ -63,15 +63,43 @@ export const mpWebhook = (req: any, res: any) => {
 };
 
 /**
- * Maneja la redirección luego de un pago exitoso.
+ * Maneja la redirección luego de un pago exitoso y guarda la transacción en la base de datos.
+ * Se espera recibir en req.query:
+ * - payment_id
+ * - status
+ * - merchant_order_id
+ * - product_id: ID del producto comprado
+ * - buyer_id: ID del comprador
+ * - total_amount: Monto total de la transacción
+ * - payment_method: Método de pago utilizado
  */
 export const paymentSuccess = (req: any, res: any) => {
-  const { payment_id, status, merchant_order_id } = req.query;
-  res.status(200).json({
-    message: "Pago aprobado",
-    payment_id,
-    status,
-    merchant_order_id,
+  const { payment_id, status, merchant_order_id, product_id, buyer_id, total_amount, payment_method } = req.query;
+
+  if (!payment_id || !status || !merchant_order_id || !product_id || !buyer_id || !total_amount || !payment_method) {
+    return res.status(400).json({ error: "Faltan parámetros necesarios para guardar la transacción" });
+  }
+  
+  const transactionDate = new Date();
+  const transactionStatus = "completed"; // Se asume que el pago aprobado es completado
+
+  const insertQuery = `
+    INSERT INTO transaction (product_id, buyer_id, transaction_date, payment_method, total_amount, transaction_status)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `;
+
+  executeQuery(insertQuery, [product_id, buyer_id, transactionDate, payment_method, total_amount, transactionStatus], (err: any, results: any) => {
+    if (err) {
+      console.error("Error al guardar la transacción:", err);
+      return res.status(500).json({ error: "Error al guardar la transacción" });
+    }
+    
+    res.status(200).json({
+      message: "Pago aprobado y transacción guardada",
+      payment_id,
+      status,
+      merchant_order_id,
+    });
   });
 };
 
@@ -88,3 +116,34 @@ export const paymentFailure = (req: any, res: any) => {
 export const paymentPending = (req: any, res: any) => {
   res.status(200).json({ message: "El pago está pendiente" });
 };
+
+/**
+ * Endpoint para obtener el historial de compras (transacciones) de un usuario.
+ * Se espera recibir en req.query:
+ * - buyer_id: ID del comprador para filtrar sus transacciones
+ */
+export const getPurchaseHistory = (req: any, res: any) => {
+    const buyer_id = req.user.id; // Obtenemos el id del usuario autenticado
+  
+    if (!buyer_id) {
+      return res.status(400).json({ error: "El id del comprador es obligatorio para obtener el historial de compras" });
+    }
+    
+    const selectQuery = `
+      SELECT * FROM transaction
+      WHERE buyer_id = ?
+      ORDER BY transaction_date DESC
+    `;
+    
+    executeQuery(selectQuery, [buyer_id], (err: any, results: any) => {
+      if (err) {
+        console.error("Error al obtener el historial de transacciones:", err);
+        return res.status(500).json({ error: "Error al obtener el historial de transacciones" });
+      }
+      
+      res.status(200).json({
+        message: "Historial de transacciones obtenido correctamente",
+        transactions: results
+      });
+    });
+  };
