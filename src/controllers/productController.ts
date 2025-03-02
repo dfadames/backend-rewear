@@ -49,11 +49,10 @@ export const getProductInfo = (req: any, res: any, next: any) => {
   });
 };
 
-// crear producto
 export const createProduct = async (req: any, res: any) => {
   try {
     // Extraer datos del cuerpo de la petición
-    const { name_product, category, price, description, status, publication_status } = req.body;
+    const { name_product, category, price, description, status, publication_status, imageUrl } = req.body;
     const seller_id = req.user.id; // Se asume que el usuario autenticado está en req.user
     const publication_date = new Date().toISOString().slice(0, 10);
     const pubStatus = publication_status || 'available';
@@ -63,19 +62,20 @@ export const createProduct = async (req: any, res: any) => {
       return res.status(400).json({ error: "Todos los campos son obligatorios: name_product, price, category, description y status" });
     }
 
-    // Validar que se envíe una imagen
-    if (!req.files || !req.files.image) {
-      return res.status(400).json({ error: "Debes subir una imagen del producto." });
+    let finalImageUrl = imageUrl; // Se puede enviar en el body una URL ya subida
+
+    // Si no se envió imageUrl y hay un archivo, se sube a Cloudinary
+    if (!finalImageUrl) {
+      if (!req.files || !req.files.image) {
+        return res.status(400).json({ error: "Debes subir una imagen del producto." });
+      }
+  
+      const imageFile = req.files.image;
+      const result = await cloudinary.v2.uploader.upload(imageFile.tempFilePath, {
+        folder: "rewear_products", // Carpeta donde se guardarán las imágenes en Cloudinary
+      });
+      finalImageUrl = result.secure_url; // URL de la imagen en Cloudinary
     }
-
-    // Obtener el archivo de imagen
-    const imageFile = req.files.image;
-
-    // Subir la imagen a Cloudinary
-    const result = await cloudinary.v2.uploader.upload(imageFile.tempFilePath, {
-      folder: "rewear_products", // Carpeta donde se guardarán las imágenes en Cloudinary
-    });
-    const imageUrl = result.secure_url; // URL de la imagen en Cloudinary
 
     // Preparamos la consulta SQL para insertar el nuevo producto, incluyendo la URL de la imagen
     const query = `
@@ -83,11 +83,11 @@ export const createProduct = async (req: any, res: any) => {
       (seller_id, name_product, category, price, description, status, publication_status, publication_date, image_path) 
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
-
+  
     // Ejecutar la consulta en la base de datos
     executeQuery(
       query,
-      [seller_id, name_product, category, price, description, status, pubStatus, publication_date, imageUrl],
+      [seller_id, name_product, category, price, description, status, pubStatus, publication_date, finalImageUrl],
       (err: any, results: any) => {
         if (err) {
           console.error("Error al crear el producto:", err);
@@ -96,11 +96,10 @@ export const createProduct = async (req: any, res: any) => {
         res.status(201).json({
           message: "Producto creado exitosamente",
           productId: results.insertId,
-          imageUrl: imageUrl,
+          imageUrl: finalImageUrl,
         });
       }
     );
-
   } catch (error) {
     console.error("Error en createProduct:", error);
     res.status(500).json({ error: "Error interno del servidor" });
