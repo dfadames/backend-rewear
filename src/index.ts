@@ -47,7 +47,7 @@ app.use(cors(corsOptions));
 const PORT = process.env.PORT;
 
 //importamos el direccionamiento de rutas:
-import { login, register, resetPassword, updatePassword, googleAuth } from "./controllers/authController";
+import { login, register, resetPassword, updatePassword, googleAuth , updatePasswordnormal} from "./controllers/authController";
 import { ping, getUsuarios } from "./controllers/othersController";
 import { authenticateToken } from "./token/authtoken";
 import { getProfileInfo, getUserProfileByUsername, getUserProfileById, getuseridByUsername, deleteProfile  } from "./controllers/profileController";
@@ -103,8 +103,10 @@ app.post("/idexterno", getuseridByUsername);
 app.get("/user/:username", getUserProfileByUsername);
 // Eliminar perfil
 app.delete("/eliminarperfil", authenticateToken, deleteProfile);
-
-
+// Update password desde el perfil
+app.put('/update-password-normal', async (req, res) => {
+  await updatePasswordnormal(req, res);
+});
 //-------------------------------------------------------------------------
 //BUSQUEDA DE PRODUCTOS
 app.get("/search/:name", getProductsByName, (req: any, res: any) => {

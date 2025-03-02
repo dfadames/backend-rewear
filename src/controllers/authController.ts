@@ -249,3 +249,31 @@ export const updatePassword = async (req: Request, res: Response) => {
   });
 };
 
+export const updatePasswordnormal = async (req: Request, res: Response) => {
+  const token = req.headers.authorization;
+  const { newPassword } = req.body;
+
+  if (!token || !newPassword) {
+    return res.status(400).json({ error: "Token y nueva contraseña son obligatorios" });
+  }
+
+  try {
+    const decoded: any = jwt.verify(token, secretKey);
+    const email = decoded.username;
+
+    // Hashear la nueva contraseña
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Actualizar la contraseña en la base de datos
+    const updateQuery = "UPDATE user SET password = ? WHERE email = ?";
+    executeQuery(updateQuery, [hashedPassword, email], (updateErr: Error) => {
+      if (updateErr) {
+        return res.status(500).json({ error: "Error al actualizar la contraseña" });
+      }
+      console.log(`Contraseña actualizada para ${email}`);
+      res.status(200).json({ message: "Contraseña actualizada correctamente" });
+    });
+  } catch (error) {
+    return res.status(401).json({ error: "Token inválido o expirado" });
+  }
+};
