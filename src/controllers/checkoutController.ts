@@ -92,7 +92,7 @@ export const paymentSuccess = (req: any, res: any) => {
   const updateQuery = `
     UPDATE product
     SET publication_status = 'out_of_stock'
-    WHERE id = ?
+    WHERE product_id = ?
   `;
 
   executeQuery(insertQuery, [product_id, buyer_id, transactionDate, payment_method, total_amount, transactionStatus], (err: any, results: any) => {
