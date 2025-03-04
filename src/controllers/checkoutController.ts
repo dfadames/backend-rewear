@@ -94,7 +94,11 @@ export const paymentSuccess = (req: any, res: any) => {
     SET publication_status = 'out_of_stock'
     WHERE product_id = ?
   `;
-
+// eliminar carrito de compras
+  const deleteQuery = `
+    DELETE FROM cart
+    WHERE product_id = ?
+  `;
   executeQuery(insertQuery, [product_id, buyer_id, transactionDate, payment_method, total_amount, transactionStatus], (err: any, results: any) => {
     if (err) {
       console.error("Error al guardar la transacción:", err);
