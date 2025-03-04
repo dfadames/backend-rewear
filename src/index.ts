@@ -60,7 +60,6 @@ import {getProductsByName} from "./controllers/searchProducts";
 import {getProductsByFilters} from "./controllers/productSearchFilter";
 import {createPaymentPreference, mpWebhook, paymentSuccess, paymentFailure, paymentPending, getPurchaseHistory   } from "./controllers/checkoutController";
 import {createReview, getReviewsByUsername} from "./controllers/reviewController";
-import { checkoutCart } from "./controllers/othersController";
 // con base al token obtenemos la info necesaria
 const getProfileData = [authenticateToken, getProfileInfo];
 const createProductData = [authenticateToken, createProduct];
@@ -166,4 +165,3 @@ app.get("/payment/history", authenticateToken, getPurchaseHistory);
 app.get("/ping", ping);
 app.get("/usuarios", getUsuarios);
 // Middleware para obtener la información del producto
-app.post("/cart/checkout", checkoutCart);
