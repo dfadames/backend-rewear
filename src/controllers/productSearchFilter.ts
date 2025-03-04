@@ -34,9 +34,11 @@ export const getProductsByFilters = (req: Request, res: Response) => {
     params.push(status);
   }
   
+  // Agregamos la condición de disponibilidad directamente en la consulta
   const query = `
     SELECT * FROM product
     WHERE ${filters.join(" AND ")}
+      AND publication_status = 'available'
   `;
   
   console.log("Query:", query);
