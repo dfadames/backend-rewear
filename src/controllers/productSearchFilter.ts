@@ -34,7 +34,7 @@ export const getProductsByFilters = (req: Request, res: Response) => {
     params.push(status);
   }
   
-  // Agregamos la condición de disponibilidad directamente en la consulta
+  // Agregar el filtro de publicación disponible
   const query = `
     SELECT * FROM product
     WHERE ${filters.join(" AND ")}
