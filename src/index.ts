@@ -59,7 +59,7 @@ import { getProfileImage } from "./controllers/profileController";
 import {getProductsByName} from "./controllers/searchProducts";
 import {getProductsByFilters} from "./controllers/productSearchFilter";
 import {createPaymentPreference, mpWebhook, paymentSuccess, paymentFailure, paymentPending, getPurchaseHistory   } from "./controllers/checkoutController";
-import {createReview, getReviewsByUsername} from "./controllers/reviewController";
+import {createReview, getReviewsByUsername, deleteReviews} from "./controllers/reviewController";
 // con base al token obtenemos la info necesaria
 const getProfileData = [authenticateToken, getProfileInfo];
 const createProductData = [authenticateToken, createProduct];
@@ -143,6 +143,7 @@ app.get("/cart", authenticateToken, getCart);
 app.post("/reviews/:sellerId", authenticateToken, createReview);
 // Endpoint para obtener el promedio de calificaciones y comentarios por username
 app.get("/reviews/:username", getReviewsByUsername);
+app.delete("/reviews/:username", authenticateToken, deleteReviews);
 
 //-------------------------------------------------------------------------
 // RUTAS DE MERCADO PAGO

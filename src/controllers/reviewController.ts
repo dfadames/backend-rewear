@@ -120,3 +120,17 @@ export const getReviewsByUsername = (req: any, res: any) => {
     });
   });
 };
+
+//delete all reviews from a user
+export const deleteReviews = (req: any, res: any) => {
+  const userId = req.user.id;
+
+  const query = "DELETE FROM reviews WHERE user_id = ?";
+  executeQuery(query, [userId], (err: any, results: any) => {
+    if (err) {
+      console.error("Error al eliminar las reseñas:", err);
+      return res.status(500).json({ error: "Error interno del servidor" });
+    }
+    res.status(200).json({ message: "Reseñas eliminadas exitosamente" });
+  });
+}
