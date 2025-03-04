@@ -88,38 +88,50 @@ export const paymentSuccess = (req: any, res: any) => {
     VALUES (?, ?, ?, ?, ?, ?)
   `;
 
-  // Consulta para actualizar el stock del producto
+  // Actualizar el estado del producto a out_of_stock
   const updateQuery = `
     UPDATE product
     SET publication_status = 'out_of_stock'
     WHERE product_id = ?
   `;
-// eliminar carrito de compras
+
+  // Eliminar items del carrito para ese producto y usuario
   const deleteQuery = `
     DELETE FROM cart
-    WHERE product_id = ?
+    WHERE product_id = ? AND user_id = ?
   `;
+  // Primero, inserta la transacción
   executeQuery(insertQuery, [product_id, buyer_id, transactionDate, payment_method, total_amount, transactionStatus], (err: any, results: any) => {
     if (err) {
       console.error("Error al guardar la transacción:", err);
       return res.status(500).json({ error: "Error al guardar la transacción" });
     }
     
-    // Una vez guardada la transacción, actualizamos el producto
+    // Actualiza el estado del producto
     executeQuery(updateQuery, [product_id], (updateErr: any, updateResults: any) => {
       if (updateErr) {
         console.error("Error al actualizar el producto:", updateErr);
         return res.status(500).json({ error: "Error al actualizar el producto" });
       }
-      res.status(200).json({
-        message: "Pago aprobado, transacción guardada y producto actualizado a out_of_stock",
-        payment_id,
-        status,
-        merchant_order_id,
+      
+      // Finalmente, elimina el item del carrito del usuario
+      executeQuery(deleteQuery, [product_id, buyer_id], (deleteErr: any, deleteResults: any) => {
+        if (deleteErr) {
+          console.error("Error al eliminar el carrito:", deleteErr);
+          return res.status(500).json({ error: "Error al eliminar el carrito" });
+        }
+        
+        res.status(200).json({
+          message: "Pago aprobado, transacción guardada, producto actualizado a out_of_stock y carrito eliminado",
+          payment_id,
+          status,
+          merchant_order_id,
+        });
       });
     });
   });
 };
+
 
 /**
  * Maneja la redirección en caso de fallo en el pago.
