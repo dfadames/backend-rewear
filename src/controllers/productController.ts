@@ -61,7 +61,14 @@ export const createProduct = async (req: any, res: any) => {
     if (!name_product || !price || !category || !description || status === undefined) {
       return res.status(400).json({ error: "Todos los campos son obligatorios: name_product, price, category, description y status" });
     }
-
+    // Validar que el precio sea un número, no negativo, mayor a 10000 y menor a 1000000
+    if (price <= 10000 || price >= 1000000) {
+      return res.status(400).json({ error: "El precio debe ser entre $10.000 COP y $1.000.000 COP" });
+    }
+    // Validar que el status sea un número entre 1 y 10
+    if (status < 1 || status > 10) {
+      return res.status(400).json({ error: "El status debe ser un número entre 1 y 10" });
+    }
     let finalImageUrl = imageUrl; // Se puede enviar en el body una URL ya subida
 
     // Si no se envió imageUrl y hay un archivo, se sube a Cloudinary

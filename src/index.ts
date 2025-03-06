@@ -47,19 +47,20 @@ app.use(cors(corsOptions));
 const PORT = process.env.PORT;
 
 //importamos el direccionamiento de rutas:
-import { login, register, resetPassword, updatePassword, googleAuth , updatePasswordnormal} from "./controllers/authController";
+import { login, register, resetPassword, updatePassword, googleAuth , updatePasswordnormal } from "./controllers/authController";
 import { updateProfileImage } from "./controllers/profileController";
 
 import { ping, getUsuarios } from "./controllers/othersController";
 import { authenticateToken } from "./token/authtoken";
-import { getProfileInfo, getUserProfileByUsername, getUserProfileById, getuseridByUsername, deleteProfile  } from "./controllers/profileController";
+import { getProfileInfo, getUserProfileByUsername, getUserProfileById, getuseridByUsername, deleteProfile } from "./controllers/profileController";
 import { createProduct, updateProduct, deleteProduct, getAllProducts, getProductInfo, getProductsBySeller } from "./controllers/productController";
 import { addToCart, removeFromCart, getCart } from "./controllers/cartController";
 import { getProfileImage } from "./controllers/profileController";
-import {getProductsByName} from "./controllers/searchProducts";
-import {getProductsByFilters} from "./controllers/productSearchFilter";
-import {createPaymentPreference, mpWebhook, paymentSuccess, paymentFailure, paymentPending, getPurchaseHistory   } from "./controllers/checkoutController";
-import {createReview, getReviewsByUsername, deleteReviews} from "./controllers/reviewController";
+import { getProductsByName } from "./controllers/searchProducts";
+import { getProductsByFilters } from "./controllers/productSearchFilter";
+import { createPaymentPreference, mpWebhook, paymentSuccess, paymentFailure, paymentPending, getPurchaseHistory } from "./controllers/checkoutController";
+import { createReview, getReviewsByUsername, deleteReviews } from "./controllers/reviewController";
+import { createUserReport, createProductReport } from "./controllers/reportController";
 // con base al token obtenemos la info necesaria
 const getProfileData = [authenticateToken, getProfileInfo];
 const createProductData = [authenticateToken, createProduct];
@@ -158,8 +159,9 @@ app.get("/payment/pending", paymentPending);
 //paiment 
 app.get("/payment/history", authenticateToken, getPurchaseHistory);
 
-
-
+//reportes
+app.post("/report/user/",authenticateToken, createUserReport);
+app.post("/report/product/",authenticateToken, createProductReport);
 
 //-------------------------------------------------------------------------
 //rutas de funcionalidades varias:

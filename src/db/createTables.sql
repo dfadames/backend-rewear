@@ -121,3 +121,28 @@ CREATE TABLE cart (
     REFERENCES product(id)
     ON DELETE CASCADE
 );
+
+CREATE TABLE user_reports (
+  id INT NOT NULL AUTO_INCREMENT,
+  user_report_id INT NOT NULL,
+  user_id_reported INT NOT NULL,
+  category_report VARCHAR(400) NOT NULL,
+  comment VARCHAR(400) NOT NULL,
+  publication_date DATE NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT fk_user_report_id FOREIGN KEY (user_report_id) REFERENCES user(id),
+  CONSTRAINT fk_user_reported FOREIGN KEY (user_id_reported) REFERENCES user(id)
+);
+
+
+CREATE TABLE product_reports (
+  id INT NOT NULL AUTO_INCREMENT,
+  user_report_id INT NOT NULL,
+  product_id_reported INT NOT NULL,
+  category_report VARCHAR(400) NOT NULL,
+  comment VARCHAR(400) NOT NULL,
+  publication_date DATE NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT fk_product_report_user FOREIGN KEY (user_report_id) REFERENCES user(id),
+  CONSTRAINT fk_product_reported FOREIGN KEY (product_id_reported) REFERENCES product(id)
+);
